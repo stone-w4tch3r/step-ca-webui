@@ -207,18 +207,12 @@ class LogSeverity(Enum):
     ERROR = "ERROR"
 
 
-class ActionType(Enum):
-    GENERATE_CERT = "GENERATE_CERT"
-    REVOKE_CERT = "REVOKE_CERT"
-    # etc
-
-
 @dataclass
 class CommandInfo:
     command: str
     output: str
     exit_code: int
-    action: ActionType
+    action: str
 
 
 @dataclass
@@ -358,7 +352,7 @@ paths:
                 $ref: '#/components/schemas/LogEntry'
 
 
-  /logs: #TODO simplify?
+  /logs:
     get:
       summary: Retrieve logs
       parameters:
@@ -507,6 +501,186 @@ components:
         exitCode:
           type: integer
 ```
+
+### Class Diagram
+```puml
+@startuml
+
+package "Shared Components" {
+  class CLIWrapper {
+    - sanitize_input(input)
+    + execute_command(command)
+  }
+
+  class Logger {
+    - log_file: str
+    + log(severity, message, trace_id, command_info)
+    + get_logs(filters)
+    + get_log_entry(log_id)
+  }
+
+  enum LogSeverity {
+    DEBUG
+    INFO
+    WARN
+    ERROR
+  }
+
+  class CommandInfo {
+    + command: str
+    + output: str
+    + exit_code: int
+    + action: str
+  }
+
+  class LogEntry {
+    + entry_id: int
+    + timestamp: datetime
+    + severity: LogSeverity
+    + message: str
+    + trace_id: UUID
+    + command_info: CommandInfo
+  }
+
+  Logger --> LogSeverity : uses
+  Logger --> LogEntry : creates
+  LogEntry --> CommandInfo : contains
+}
+
+package "WebFrontend Container" {
+  class FlaskWebServer {
+    - app: Flask
+    + run()
+    + route_dashboard()
+    + route_logs()
+    + route_certificate_management()
+  }
+
+  class UIComponents {
+    + render_dashboard()
+    + render_logs_page()
+    + render_certificate_list()
+    + render_generate_cert_modal()
+  }
+
+  class APIClient {
+    - base_url: str
+    - api_key: str
+    + get_certificates()
+    + generate_certificate(params)
+    + renew_certificate(cert_id, duration)
+    + revoke_certificate(cert_id)
+    + get_logs(filters)
+  }
+
+  FlaskWebServer --> UIComponents : uses
+  FlaskWebServer --> APIClient : uses
+}
+
+package "Core Container" {
+  class MainApplication {
+    + initialize()
+    + run()
+  }
+
+  class APIServer {
+    - app: Flask
+    + run()
+    + route_certificates()
+    + route_generate_certificate()
+    + route_renew_certificate()
+    + route_revoke_certificate()
+    + route_logs()
+  }
+
+  class CertificateManager {
+    + list_certificates()
+    + generate_certificate(params)
+    + renew_certificate(cert_id, duration)
+    + revoke_certificate(cert_id)
+  }
+
+  MainApplication --> APIServer : initializes
+  MainApplication --> CertificateManager : uses
+  MainApplication --> Logger : uses
+
+  APIServer --> CertificateManager : uses
+  APIServer --> Logger : uses
+
+  CertificateManager --> CLIWrapper : uses
+  CertificateManager --> Logger : uses
+}
+
+package "AutoSetup Component" {
+  class AutoSetup {
+    + install_stepca()
+    + setup_stepca()
+    + create_root_certificate()
+    + prepare_mtls_certificates()
+    + run_docker_compose()
+  }
+
+  AutoSetup --> CLIWrapper : uses
+  AutoSetup --> Logger : uses
+}
+
+
+package "Host System" {
+    rectangle "step-ca CLI" as stepca {
+    }
+}
+
+CLIWrapper --> stepca : executes commands
+
+APIClient ..> APIServer : communicates via mTLS
+
+@enduml
+```
+
+### File structure
+```
+project_root/
+│
+├── docker-compose.yml
+├── README.md
+│
+├── shared/
+│   ├── __init__.py
+│   ├── cli_wrapper.py
+│   ├── logger.py
+│   └── models.py
+│
+├── web_frontend/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── app.py
+│   ├── api_client.py
+│   ├── ui_components.py
+│   └── templates/
+│       ├── base.html
+│       ├── dashboard.html
+│       ├── logs.html
+│       ├── certificate_management.html
+│       └── modals/
+│           └── generate_cert.html
+│
+├── core/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── main.py
+│   ├── api_server.py
+│   └── certificate_manager.py
+│
+├── auto_setup/
+│   ├── auto_setup.py
+│   └── requirements.txt
+│
+└── config/
+    ├── app_config.yml
+    └── logging_config.yml
+```
+
+
 ---
 
 # TODO
