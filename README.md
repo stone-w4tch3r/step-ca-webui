@@ -248,15 +248,22 @@ paths:
   /certificates:
     get:
       summary: List all certificates
+      parameters:
+        - name: preview
+          in: query
+          schema:
+            type: boolean
       responses:
         '200':
           description: Successful response
           content:
-            application/json:    
+            application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Certificate'
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Certificate'
+                  - $ref: '#/components/schemas/CommandPreview'
 
   /certificates/generate:
     post:
@@ -362,13 +369,13 @@ paths:
             type: array
             items:
               type: string
-              enum: [DEBUG, INFO, WARN, ERROR]
+              enum: [ DEBUG, INFO, WARN, ERROR ]
         - name: traceId
           in: query
           schema:
             type: string
             description: "UUID format"
-        - name: commands_only
+        - name: commandsOnly
           in: query
           schema:
             type: boolean
@@ -401,7 +408,7 @@ components:
           type: string
         status:
           type: string
-          enum: [Active, Expired, Revoked]
+          enum: [ Active, Expired, Revoked ]
         expirationDate:
           type: string
           format: date-time
@@ -413,7 +420,7 @@ components:
           type: string
         keyType:
           type: string
-          enum: [RSA, ECDSA]
+          enum: [ RSA, ECDSA ]
         duration:
           type: string
 
@@ -480,7 +487,7 @@ components:
           format: date-time
         severity:
           type: string
-          enum: [DEBUG, INFO, WARN, ERROR]
+          enum: [ DEBUG, INFO, WARN, ERROR ]
         message:
           type: string
         traceId:
@@ -502,7 +509,7 @@ components:
           type: integer
 ```
 
-### Class Diagram
+### Class Diagram  
 ```puml
 @startuml
 
@@ -684,3 +691,4 @@ project_root/
 ---
 
 # TODO
+- [ ] Adjust class diagram after finalizing the project
