@@ -27,7 +27,13 @@ paths:
                     items:
                       $ref: '#/components/schemas/Certificate'
                   - $ref: '#/components/schemas/CommandPreview'
-
+        'default':
+          description: Error
+          content:
+            text/plain:
+              schema:
+                type: string
+  
   /certificates/generate:
     post:
       summary: Generate certificate
@@ -51,6 +57,12 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/CertificateGenerateResult'
                   - $ref: '#/components/schemas/CommandPreview'
+        'default':
+          description: Error
+          content:
+            text/plain:
+              schema:
+                type: string
 
   /certificates/renew:
     post:
@@ -80,6 +92,12 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/CertificateRenewResult'
                   - $ref: '#/components/schemas/CommandPreview'
+        'default':
+          description: Error
+          content:
+            text/plain:
+              schema:
+                type: string
 
   /certificates/revoke:
     post:
@@ -103,6 +121,12 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/CertificateRevokeResult'
                   - $ref: '#/components/schemas/CommandPreview'
+        'default':
+          description: Error
+          content:
+            text/plain:
+              schema:
+                type: string
 
   /logs/single:
     get:
@@ -112,7 +136,7 @@ paths:
           in: query
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: Successful response
@@ -120,36 +144,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LogEntry'
+        'default':
+          description: Error
+          content:
+            text/plain:
+              schema:
+                type: string
 
 
   /logs:
-    get:
+    post:
       summary: Retrieve logs
-      parameters:
-        - name: severity
-          in: query
-          schema:
-            type: array
-            items:
-              type: string
-              enum: [ DEBUG, INFO, WARN, ERROR ]
-        - name: traceId
-          in: query
-          schema:
-            type: string
-            description: "UUID format"
-        - name: commandsOnly
-          in: query
-          schema:
-            type: boolean
-        - name: page
-          in: query
-          schema:
-            type: integer
-        - name: pageSize
-          in: query
-          schema:
-            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogsRequest'
       responses:
         '200':
           description: Successful response
@@ -159,6 +170,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/LogEntry'
+        'default':
+          description: Error
+          content:
+            text/plain:
+              schema:
+                type: string
 
 components:
   schemas:
@@ -239,6 +256,24 @@ components:
         revocationDate:
           type: string
           format: date-time
+    
+    LogsRequest:
+      type: object
+      properties:
+        traceId:
+          type: string
+          description: "UUID format"
+        commandsOnly:
+          type: boolean
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        severity:
+          type: array
+          items:
+            type: string
+            enum: [ DEBUG, INFO, WARN, ERROR ]
 
     LogEntry:
       type: object
@@ -257,16 +292,13 @@ components:
           type: string
           description: "UUID format"
         commandInfo:
-          $ref: '#/components/schemas/CommandInfo'
-          nullable: true
           description: Contains command execution info, if entry is related to command
-
-    CommandInfo:
-      type: object
-      properties:
-        command:
-          type: string
-        output:
-          type: string
-        exitCode:
-          type: integer
+          nullable: true
+          type: object
+          properties:
+            command:
+              type: string
+            output:
+              type: string
+            exitCode:
+              type: integer

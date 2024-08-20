@@ -1,4 +1,5 @@
 import logging
+import uuid
 from datetime import datetime
 from typing import Dict, List, Optional
 from uuid import UUID
@@ -19,7 +20,7 @@ class Logger:
         message: str,
         command_info: Optional[CommandInfo] = None
     ) -> int:
-        trace_id = g.trace_id if hasattr(g, 'trace_id') else "AUTO_SCOPE_BROKEN"
+        trace_id = g.trace_id if hasattr(g, 'trace_id') else uuid.UUID("00000000-0000-0000-0000-000000000000")
         log_entry = LogEntry(
             entry_id=self._get_next_entry_id(),
             timestamp=datetime.now(),
@@ -52,11 +53,34 @@ class Logger:
     def get_logs(self, filters: Dict) -> List[LogEntry]:
         # Implementation for retrieving logs based on filters
         # This is a placeholder and would need to be implemented based on your storage mechanism
+        return [
+            LogEntry(
+                entry_id=1,
+                timestamp=datetime.now(),
+                severity=LogSeverity.INFO,
+                message="This is a log entry",
+                trace_id=UUID("123e4567-e89b-12d3-a456-426614174000")
+            ),
+            LogEntry(
+                entry_id=2,
+                timestamp=datetime.now(),
+                severity=LogSeverity.ERROR,
+                message="This is an error log entry",
+                trace_id=UUID("123e4567-e89b-12d3-a456-426614174000")
+            )
+        ]
         raise NotImplementedError
 
     def get_log_entry(self, log_id: int) -> Optional[LogEntry]:
         # Implementation for retrieving a single log entry
         # This is a placeholder and would need to be implemented based on your storage mechanism
+        return LogEntry(
+            entry_id=log_id,
+            timestamp=datetime.now(),
+            severity=LogSeverity.INFO,
+            message="This is a log entry",
+            trace_id=UUID("123e4567-e89b-12d3-a456-426614174000")
+        )
         raise NotImplementedError
 
     def _write_log_entry(self, log_entry: LogEntry) -> None:
@@ -68,6 +92,7 @@ class Logger:
     def _get_next_entry_id(self) -> int:
         # Implementation for generating the next entry ID
         # This is a placeholder and would need to be implemented based on your storage mechanism
+        return 1
         raise NotImplementedError
 
     @staticmethod
