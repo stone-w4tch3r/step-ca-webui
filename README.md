@@ -65,55 +65,10 @@ All on one page
 # Architecture
 
 ### Overview
-```puml
-@startuml
-!define RECTANGLE class
-!define DOCKER_NETWORK frame
+Diagram describes general architecture of the application. [Source PUML code](docs/architecture-overview.puml)
 
-skinparam componentStyle uml2
+![architecture overview]()
 
-actor "User" as user
-cloud "Internet" as internet
-
-rectangle "Host System" {
-  [Bunkerweb] as bunkerweb
-  [Caddy] as caddy
-  [Authelia] as authelia
-  
-  DOCKER_NETWORK "Docker Network" {
-    package "WebFrontend Container" as webfront {
-      [Flask Web Server]
-    }
-    
-    package "Core Container" as coreapp {
-      [Main Application]
-      [Logging]
-      [API Server]
-      [CLI Wrapper]
-    }
-  }
-  
-  [step-ca CLI] as stepcacli
-}
-
-user -down-> internet
-internet -down-> bunkerweb
-bunkerweb -down-> caddy
-caddy -down-> authelia
-authelia -down-> webfront
-
-webfront -down-> coreapp : mTLS & authenticated API calls
-
-coreapp -down-> stepcacli : Limited sudo access
-
-note right of bunkerweb : Web Firewall
-note right of caddy : HTTPS & Reverse Proxy
-note right of authelia : Authentication
-note right of webfront : Runs without permissions
-note right of coreapp : Runs with limited permissions & AppArmor/SELinux profile
-note right of stepcacli : Installed globally on host
-@enduml
-```
 
 ### UI Mockup
 Main page:
@@ -233,14 +188,12 @@ class LogEntry:
 - Scoped logging (trace_id) implemented for tracking actions across multiple log entries
 
 ### Core API
-
 See [docs/core-api.md](docs/core-api.md) for OpenAPI specification.
 
----
+### Class Diagram
+Describes the class structure of the application's python components. [Source PUML code](docs/class-diagram.puml)
 
-### Class Diagram  
-
-See XXX
+![class diagram](https://plantuml.com/plantuml/svg/5Ssz3GCX343XFbCa0t0kaYhLhU8pre441lb7h1zIFNtLEyrHFNfxlAfGYyoXxLdSftq15DTnLoznXR7I46VnWqO7yo6SriUfl7MBPo9CYw-eq75R8Gyoe8PcALUy5Vin_wEJ9U_-0000)
 
 ### File structure
 ```
@@ -249,6 +202,10 @@ project_root/
 ├── docker-compose.yml
 ├── README.md
 │
+├── docs/
+│   ├── class-diagram.puml
+│   ├── core-api.md
+│   └── ...
 ├── shared/
 │   ├── __init__.py
 │   ├── cli_wrapper.py
@@ -284,7 +241,6 @@ project_root/
     ├── app_config.yml
     └── logging_config.yml
 ```
-
 
 ---
 

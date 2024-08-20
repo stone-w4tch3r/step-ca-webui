@@ -1,0 +1,49 @@
+This diagram describes general architecture of the application. 
+
+@startuml
+!define RECTANGLE class
+!define DOCKER_NETWORK frame
+
+skinparam componentStyle uml2
+
+actor "User" as user
+cloud "Internet" as internet
+
+rectangle "Host System" {
+  [Bunkerweb] as bunkerweb
+  [Caddy] as caddy
+  [Authelia] as authelia
+  
+  DOCKER_NETWORK "Docker Network" {
+    package "WebFrontend Container" as webfront {
+      [Flask Web Server]
+    }
+    
+    package "Core Container" as coreapp {
+      [Main Application]
+      [Logging]
+      [API Server]
+      [CLI Wrapper]
+    }
+  }
+  
+  [step-ca CLI] as stepcacli
+}
+
+user -down-> internet
+internet -down-> bunkerweb
+bunkerweb -down-> caddy
+caddy -down-> authelia
+authelia -down-> webfront
+
+webfront -down-> coreapp : mTLS & authenticated API calls
+
+coreapp -down-> stepcacli : Limited sudo access
+
+note right of bunkerweb : Web Firewall
+note right of caddy : HTTPS & Reverse Proxy
+note right of authelia : Authentication
+note right of webfront : Runs without permissions
+note right of coreapp : Runs with limited permissions & AppArmor/SELinux profile
+note right of stepcacli : Installed globally on host
+@enduml
