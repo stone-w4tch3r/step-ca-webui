@@ -4,8 +4,6 @@ from datetime import datetime
 from typing import Dict, List, Optional
 from uuid import UUID
 
-from flask import g
-
 from .models import LogEntry, LogSeverity, CommandInfo
 
 
@@ -20,7 +18,8 @@ class Logger:
         message: str,
         command_info: Optional[CommandInfo] = None
     ) -> int:
-        trace_id = g.trace_id if hasattr(g, 'trace_id') else uuid.UUID("00000000-0000-0000-0000-000000000000")
+        # trace_id = g.trace_id if hasattr(g, 'trace_id') else uuid.UUID("00000000-0000-0000-0000-000000000000")
+        trace_id = uuid.UUID("00000000-0000-0000-0000-000000000000")
         log_entry = LogEntry(
             entry_id=self._get_next_entry_id(),
             timestamp=datetime.now(),

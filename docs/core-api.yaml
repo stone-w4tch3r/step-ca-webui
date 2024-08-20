@@ -218,7 +218,7 @@ components:
         message:
           type: string
         logEntryId:
-          type: string
+          type: integer
         certificateId:
           type: string
         certificateName:
@@ -235,7 +235,7 @@ components:
         message:
           type: string
         logEntryId:
-          type: string
+          type: integer
         certificateId:
           type: string
         newExpirationDate:
@@ -250,7 +250,7 @@ components:
         message:
           type: string
         logEntryId:
-          type: string
+          type: integer
         certificateId:
           type: string
         revocationDate:
@@ -262,23 +262,24 @@ components:
       properties:
         traceId:
           type: string
-          description: "UUID format"
+          description: "UUID4 format"
+          nullable: true
         commandsOnly:
           type: boolean
-        page:
-          type: integer
-        pageSize:
-          type: integer
         severity:
           type: array
           items:
             type: string
             enum: [ DEBUG, INFO, WARN, ERROR ]
+        page:
+          type: integer
+        pageSize:
+          type: integer
 
     LogEntry:
       type: object
       properties:
-        entry_id:
+        entryId:
           type: integer
         timestamp:
           type: string
