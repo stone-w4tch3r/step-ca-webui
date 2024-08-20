@@ -128,7 +128,8 @@ project_root/
 ├── docs/
 │   ├── class-diagram.puml
 │   ├── core-api.yaml
-│   └── architecture-overview.puml
+│   ├── architecture-overview.puml
+│   └── ui-mockups.md
 ├── shared/
 │   ├── __init__.py
 │   ├── cli_wrapper.py
