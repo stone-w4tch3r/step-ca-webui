@@ -52,18 +52,16 @@ class CertificateManager:
         success = exit_code == 0
         message = "Certificate generated successfully" if success else "Failed to generate certificate"
 
-        trace_id = uuid4()  # TODO: use scoped logging
-        self.logger.log(
+        entry_id = self.logger.log_scoped(
             LogSeverity.INFO if success else LogSeverity.ERROR,
             message,
-            trace_id,
             CommandInfo(command, output, exit_code, "GENERATE_CERT")
         )
 
         return {  # TODO: extract to dataclass or namedtuple or typed dict
             "success": success,
             "message": message,
-            "logEntryId": str(trace_id),
+            "logEntryId": str(entry_id),
             "certificateId": params['keyName'],
             "certificateName": params['keyName'],
             "expirationDate": (datetime.now() + self._parse_duration(params['duration'])).isoformat()  # TODO: remove _parse_duration
@@ -81,18 +79,16 @@ class CertificateManager:
         success = exit_code == 0
         message = "Certificate renewed successfully" if success else "Failed to renew certificate"
 
-        trace_id = uuid4()  # TODO: use scoped logging
-        self.logger.log(
+        entry_id = self.logger.log_scoped(
             LogSeverity.INFO if success else LogSeverity.ERROR,
             message,
-            trace_id,
             CommandInfo(command, output, exit_code, "RENEW_CERT")
         )
 
         return {
             "success": success,
             "message": message,
-            "logEntryId": str(trace_id),
+            "logEntryId": str(entry_id),
             "certificateId": cert_id,
             "newExpirationDate": (datetime.now() + timedelta(seconds=duration)).isoformat()
         }
@@ -109,18 +105,16 @@ class CertificateManager:
         success = exit_code == 0
         message = "Certificate revoked successfully" if success else "Failed to revoke certificate"
 
-        trace_id = uuid4()  # TODO: use scoped logging
-        self.logger.log(
+        entry_id = self.logger.log_scoped(
             LogSeverity.INFO if success else LogSeverity.ERROR,
             message,
-            trace_id,
             CommandInfo(command, output, exit_code, "REVOKE_CERT")
         )
 
         return {
             "success": success,
             "message": message,
-            "logEntryId": str(trace_id),
+            "logEntryId": str(entry_id),
             "certificateId": cert_id,
             "revocationDate": datetime.now().isoformat()
         }

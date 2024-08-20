@@ -1,7 +1,10 @@
 import logging
-from typing import Dict, List, Optional
 from datetime import datetime
+from typing import Dict, List, Optional
 from uuid import UUID
+
+from flask import g
+
 from .models import LogEntry, LogSeverity, CommandInfo
 
 
@@ -10,10 +13,13 @@ class Logger:
         self.log_file = log_file
         logging.basicConfig(filename=log_file, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    def log(
-        self, severity: LogSeverity, message: str, trace_id: UUID,
+    def log_scoped(
+        self,
+        severity: LogSeverity,
+        message: str,
         command_info: Optional[CommandInfo] = None
-    ) -> None:
+    ) -> int:
+        trace_id = g.trace_id if hasattr(g, 'trace_id') else "AUTO_SCOPE_BROKEN"
         log_entry = LogEntry(
             entry_id=self._get_next_entry_id(),
             timestamp=datetime.now(),
@@ -23,6 +29,25 @@ class Logger:
             command_info=command_info
         )
         self._write_log_entry(log_entry)
+        return log_entry.entry_id
+
+    def log_with_trace(
+        self,
+        severity: LogSeverity,
+        message: str,
+        trace_id: UUID,
+        command_info: Optional[CommandInfo] = None
+    ) -> int:
+        log_entry = LogEntry(
+            entry_id=self._get_next_entry_id(),
+            timestamp=datetime.now(),
+            severity=severity,
+            message=message,
+            trace_id=trace_id,
+            command_info=command_info
+        )
+        self._write_log_entry(log_entry)
+        return log_entry.entry_id
 
     def get_logs(self, filters: Dict) -> List[LogEntry]:
         # Implementation for retrieving logs based on filters

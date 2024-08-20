@@ -1,15 +1,38 @@
-from flask import Flask, request, jsonify, Response
-from typing import Dict, List, Union, Tuple
-from uuid import uuid4
+import uuid
+from contextlib import contextmanager
+
+from flask import Flask, request, jsonify, Response, g
+
 from certificate_manager import CertificateManager
-from shared.logger import Logger, LogSeverity
-from shared.models import CommandInfo
+from shared.logger import Logger
+
+
+@contextmanager
+def _logging_scope():
+    """
+    Context manager for setting up a unique trace ID for each request in a Flask application.
+
+    This function ensures that each request has a unique trace ID, which can be used for logging.
+    It generates a unique UUID and assigns it to the Flask `g` (global) object as `trace_id`.
+
+    Usage:
+        with _logging_scope():
+            # Code within this block can access g.trace_id
+            pass
+        # After this block, the finally part of _logging_scope is executed
+    """
+    g.trace_id = str(uuid.uuid4())
+    try:
+        yield
+    finally:
+        pass
 
 
 class APIServer:
-    _app = Flask(__name__)
 
     def __init__(self, cert_manager: CertificateManager, logger: Logger):
+        self._app = Flask(__name__)
+
         self.cert_manager = cert_manager
         self.logger = logger
 
@@ -19,6 +42,17 @@ class APIServer:
         self._app.add_url_rule('/certificates/revoke', 'revoke_certificate', self.revoke_certificate, methods=['POST'])
         self._app.add_url_rule('/logs', 'get_logs', self.get_logs, methods=['GET'])
         self._app.add_url_rule('/logs/single', 'get_log_entry', self.get_log_entry, methods=['GET'])
+
+        @self._app.before_request
+        def set_logging_scope():
+            g.logging_scope = _logging_scope()
+            g.logging_scope.__enter__()
+
+        @self._app.after_request
+        def clear_logging_scope(response):
+            if hasattr(g, 'logging_scope'):
+                g.logging_scope.__exit__(None, None, None)
+            return response
 
     def run(self):
         self._app.run(host='0.0.0.0', port=5000)

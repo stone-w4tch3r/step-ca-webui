@@ -170,3 +170,4 @@ project_root/
 
 # TODO
 - [ ] Adjust class diagram after finalizing the project
+- [ ] Prevent simultaneous actions calls 
