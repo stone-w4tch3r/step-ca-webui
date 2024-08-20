@@ -1,6 +1,7 @@
 import uuid
 from contextlib import contextmanager
 
+from flasgger import Swagger, swag_from
 from flask import Flask, request, jsonify, Response, g
 
 from certificate_manager import CertificateManager
@@ -11,15 +12,6 @@ from shared.logger import Logger
 def _logging_scope():
     """
     Context manager for setting up a unique trace ID for each request in a Flask application.
-
-    This function ensures that each request has a unique trace ID, which can be used for logging.
-    It generates a unique UUID and assigns it to the Flask `g` (global) object as `trace_id`.
-
-    Usage:
-        with _logging_scope():
-            # Code within this block can access g.trace_id
-            pass
-        # After this block, the finally part of _logging_scope is executed
     """
     g.trace_id = str(uuid.uuid4())
     try:
@@ -29,10 +21,10 @@ def _logging_scope():
 
 
 class APIServer:
-
     def __init__(self, cert_manager: CertificateManager, logger: Logger):
         self._app = Flask(__name__)
 
+        self._swagger = self._setup_swagger()
         self.cert_manager = cert_manager
         self.logger = logger
 
@@ -57,8 +49,12 @@ class APIServer:
     def run(self):
         self._app.run(host='0.0.0.0', port=5000)
 
+    # TODO specify type in response
+    @swag_from()
     def list_certificates(self) -> Response:
-        preview = request.args.get('preview', 'false').lower() == 'true'
+        preview = request.args['preview']
+
+        # TODO: validate here
 
         if preview:
             command = self.cert_manager.preview_list_certificates()
@@ -67,21 +63,31 @@ class APIServer:
             certificates = self.cert_manager.list_certificates()
             return jsonify(certificates)
 
+    # TODO specify type in response
+    @swag_from()
     def generate_certificate(self) -> Response:
-        params = request.json  # TODO explicit flask params
-        preview = request.args.get('preview', 'false').lower() == 'true'
+        preview = request.args['preview']
+        key_name = request.json['keyName']
+        key_type = request.json['keyType']
+        duration = request.json['duration']
+
+        # TODO: validate here
 
         if preview:
-            command = self.cert_manager.preview_generate_certificate(params)
+            command = self.cert_manager.preview_generate_certificate(key_name, key_type, duration)
             return jsonify({"command": command})
         else:
-            result = self.cert_manager.generate_certificate(params)
+            result = self.cert_manager.generate_certificate(key_name, key_type, duration)
             return jsonify(result)
 
+    # TODO specify type in response
+    @swag_from()
     def renew_certificate(self) -> Response:
-        cert_id = request.args.get('certId')
-        duration = int(request.args.get('duration'))
-        preview = request.args.get('preview', 'false').lower() == 'true'
+        cert_id = request.args['certId']
+        duration = request.args['duration']
+        preview = request.args['preview']
+
+        # TODO: validate here
 
         if preview:
             command = self.cert_manager.preview_renew_certificate(cert_id, duration)
@@ -90,9 +96,13 @@ class APIServer:
             result = self.cert_manager.renew_certificate(cert_id, duration)
             return jsonify(result)
 
+    # TODO specify type in response
+    @swag_from()
     def revoke_certificate(self) -> Response:
-        cert_id = request.args.get('certId')
-        preview = request.args.get('preview', 'false').lower() == 'true'
+        cert_id = request.args['certId']
+        preview = request.args['preview']
+
+        # TODO: validate here
 
         if preview:
             command = self.cert_manager.preview_revoke_certificate(cert_id)
@@ -101,21 +111,58 @@ class APIServer:
             result = self.cert_manager.revoke_certificate(cert_id)
             return jsonify(result)
 
+    # TODO specify type in response
+    @swag_from()
     def get_logs(self) -> Response:
+        severity = request.args['severity']
+        trace_id = request.args['traceId']
+        commands_only = request.args['commandsOnly']
+        page = request.args['page']
+        page_size = request.args['pageSize']
+
+        # TODO: validate here
+
         filters = {
-            'severity': request.args.getlist('severity'),
-            'traceId': request.args.get('traceId'),
-            'commands_only': request.args.get('commandsOnly', 'false').lower() == 'true',
-            'page': int(request.args.get('page', 1)),
-            'pageSize': int(request.args.get('pageSize', 20))
+            'severity': severity,
+            'traceId': trace_id,
+            'commands_only': commands_only,
+            'page': page,
+            'pageSize': page_size
         }
         logs = self.logger.get_logs(filters)
         return jsonify(logs)
 
+    # TODO specify type in response
+    @swag_from()
     def get_log_entry(self) -> Response | tuple[Response, int]:
-        log_id = int(request.args.get('logId'))
-        log_entry = self.logger.get_log_entry(log_id)
+        log_id = request.args['logId']
+
+        # TODO: validate here
+
+        log_entry = self.logger.get_log_entry(int(log_id))
         if log_entry:
             return jsonify(log_entry)
         else:
             return jsonify({"error": "Log entry not found"}), 404
+
+    def _setup_swagger(self):
+        config = {
+            "headers": [
+                ('Access-Control-Allow-Origin', '*'),
+                ('Access-Control-Allow-Methods', "GET, POST"),
+            ],
+            "specs": [
+                {
+                    "endpoint": 'apispec_1',
+                    "route": '/apispec_1.json',
+                    "rule_filter": lambda rule: True,
+                    "model_filter": lambda tag: True,
+                }
+            ],
+            "static_url_path": "/flasgger_static",
+            "swagger_ui": True,
+            "specs_route": "/apidocs/",
+            "openapi": "3.0.0",
+        }
+
+        return Swagger(self._app, config=config, template_file="../docs/core-api.yaml")  # TODO package in DOCKERFILE

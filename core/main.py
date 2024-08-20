@@ -9,12 +9,7 @@ class MainApplication:
         self.cert_manager = CertificateManager(self.logger)
         self.api_server = APIServer(self.cert_manager, self.logger)
 
-    def initialize(self):  # TODO remove
-        # Perform any necessary initialization
-        pass
-
     def run(self):
-        self.initialize()
         self.api_server.run()
 
 
