@@ -41,7 +41,7 @@ class APIServer:
 
     @swag_from()
     def list_certificates(self) -> Response:
-        preview = request.args.get('preview', type=bool)
+        preview = _Helper.ensure_bool(request.json['preview'] if 'preview' in request.json else None)
 
         if preview:
             command = self._cert_manager.preview_list_certificates()
@@ -52,16 +52,10 @@ class APIServer:
 
     @swag_from()
     def generate_certificate(self) -> tuple[Response, int] | Response:
-        preview = request.args.get('preview', type=bool)
-        key_name = request.json.get('keyName', type=str)
-        key_type = request.json.get('keyType', type=_Helper.check_key_type)
-        duration = request.json.get('duration', type=_Helper.check_positive_int)
-
-        if not key_name or not key_type or not duration:
-            return _Helper.create_plaintext_response("Missing required parameters"), 400
-
-        if key_type not in ['RSA', 'ECDSA']:
-            return _Helper.create_plaintext_response("Invalid key type"), 400
+        preview = _Helper.ensure_bool(request.args.get('preview'))
+        key_name = _Helper.ensure_str(request.json['keyName'] if 'keyName' in request.json else None)
+        key_type = _Helper.ensure_key_type(request.json['keyType'] if 'keyType' in request.json else None)
+        duration = _Helper.ensure_positive_int(request.json['duration'] if 'duration' in request.json else None)
 
         if preview:
             command = self._cert_manager.preview_generate_certificate(key_name, key_type, duration)
@@ -72,12 +66,9 @@ class APIServer:
 
     @swag_from()
     def renew_certificate(self) -> tuple[Response, int] | Response:
-        preview = request.args.get('preview', type=bool)
-        cert_id = request.args.get('certId', type=str)
-        duration = request.args.get('duration', type=_Helper.check_positive_int)
-
-        if not cert_id or duration is None:
-            return _Helper.create_plaintext_response("Missing required parameters"), 400
+        preview = _Helper.ensure_bool(request.json['preview'] if 'preview' in request.json else None)
+        cert_id = _Helper.ensure_str(request.json['certId'] if 'certId' in request.json else None)
+        duration = _Helper.ensure_positive_int(request.json['duration'] if 'duration' in request.json else None)
 
         if preview:
             command = self._cert_manager.preview_renew_certificate(cert_id, duration)
@@ -88,11 +79,8 @@ class APIServer:
 
     @swag_from()
     def revoke_certificate(self) -> tuple[Response, int] | Response:
-        preview = request.args.get('preview', type=bool)
-        cert_id = request.args.get('certId', type=str)
-
-        if not cert_id:
-            return _Helper.create_plaintext_response("Missing required parameters"), 400
+        preview = _Helper.ensure_bool(request.json['preview'] if 'preview' in request.json else None)
+        cert_id = _Helper.ensure_str(request.json['certId'] if 'certId' in request.json else None)
 
         if preview:
             command = self._cert_manager.preview_revoke_certificate(cert_id)
@@ -103,11 +91,11 @@ class APIServer:
 
     @swag_from()
     def get_logs(self) -> Response:
-        severity = _Helper.check_severity_list(request.json['severity'])
-        trace_id = _Helper.check_uuid(request.json['traceId'])
-        commands_only = _Helper.check_bool(request.json['commandsOnly'])
-        page = _Helper.check_positive_int(request.json['page'])
-        page_size = _Helper.check_positive_int(request.json['pageSize'])
+        severity = _Helper.ensure_severity_list(request.json['severity'] if 'severity' in request.json else None)
+        trace_id = _Helper.ensure_uuid(request.json['traceId'] if 'traceId' in request.json else None)
+        commands_only = _Helper.ensure_bool(request.json['commandsOnly'] if 'commandsOnly' in request.json else None)
+        page = _Helper.ensure_positive_int(request.json['page'] if 'page' in request.json else None)
+        page_size = _Helper.ensure_positive_int(request.json['pageSize'] if 'pageSize' in request.json else None)
 
         filters = {
             'severity': severity,
@@ -121,7 +109,7 @@ class APIServer:
 
     @swag_from()
     def get_log_entry(self) -> tuple[Response, int] | Response:
-        log_id = request.args.get('logId', type=_Helper.check_positive_int)
+        log_id = request.args.get('logId', type=_Helper.ensure_positive_int)
 
         log_entry = self._logger.get_log_entry(int(log_id))
         if not log_entry:
@@ -207,7 +195,7 @@ class _Setuper:
 
 class _Helper:
     @staticmethod
-    def check_severity_list(inpt: Any) -> list[str]:
+    def ensure_severity_list(inpt: Any) -> list[str]:
         allowed_severities = [s.upper() for s in LogSeverity]
         if not isinstance(inpt, list):
             abort(400, f"Invalid severity list, must be a list, got: {type(inpt)}")
@@ -217,30 +205,37 @@ class _Helper:
         return inpt
 
     @staticmethod
-    def check_key_type(inpt: Any) -> str:
+    def ensure_key_type(inpt: Any) -> str:
         allowed_key_types = [k.upper() for k in KeyType]
         if inpt not in allowed_key_types:
             abort(400, f"Invalid key type: '{inpt}', must be one of {allowed_key_types}")
         return inpt
 
     @staticmethod
-    def check_uuid(inpt: Any) -> uuid.UUID:
+    def ensure_uuid(inpt: Any) -> uuid.UUID:
         try:
             result = uuid.UUID(inpt)
-        except ValueError:
+        except Exception:
             abort(400, f"Invalid UUID: '{inpt}' of type {type(inpt)}")
         return result
 
     @staticmethod
-    def check_positive_int(inpt: Any) -> int:
+    def ensure_positive_int(inpt: Any) -> int:
         if not isinstance(inpt, int) or inpt <= 0:
             abort(400, f"Invalid value: '{inpt}' of type {type(inpt)}, must be a positive integer")
         return int(inpt)
 
     @staticmethod
-    def check_bool(inpt: Any) -> bool:
-        if not isinstance(inpt, bool):
+    def ensure_bool(inpt: Any) -> bool:
+        try:
+            return bool(inpt)
+        except Exception:
             abort(400, f"Invalid value: '{inpt}' of type {type(inpt)}, must be a boolean")
+
+    @staticmethod
+    def ensure_str(inpt: Any) -> str:
+        if not isinstance(inpt, str):
+            abort(400, f"Invalid value: '{inpt}' of type {type(inpt)}, must be a string")
         return inpt
 
     @staticmethod
