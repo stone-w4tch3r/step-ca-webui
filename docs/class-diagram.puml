@@ -1,0 +1,134 @@
+This diagram describes the class structure of the application's python components.
+
+@startuml
+
+package "Shared Components" {
+  class CLIWrapper {
+    - sanitize_input(input)
+    + execute_command(command)
+  }
+
+  class Logger {
+    - log_file: str
+    + log(severity, message, trace_id, command_info)
+    + get_logs(filters)
+    + get_log_entry(log_id)
+  }
+
+  enum LogSeverity {
+    DEBUG
+    INFO
+    WARN
+    ERROR
+  }
+
+  class CommandInfo {
+    + command: str
+    + output: str
+    + exit_code: int
+    + action: str
+  }
+
+  class LogEntry {
+    + entry_id: int
+    + timestamp: datetime
+    + severity: LogSeverity
+    + message: str
+    + trace_id: UUID
+    + command_info: CommandInfo
+  }
+
+  Logger --> LogSeverity : uses
+  Logger --> LogEntry : creates
+  LogEntry --> CommandInfo : contains
+}
+
+package "WebFrontend Container" {
+  class FlaskWebServer {
+    - app: Flask
+    + run()
+    + route_dashboard()
+    + route_logs()
+    + route_certificate_management()
+  }
+
+  class UIComponents {
+    + render_dashboard()
+    + render_logs_page()
+    + render_certificate_list()
+    + render_generate_cert_modal()
+  }
+
+  class APIClient {
+    - base_url: str
+    - api_key: str
+    + get_certificates()
+    + generate_certificate(params)
+    + renew_certificate(cert_id, duration)
+    + revoke_certificate(cert_id)
+    + get_logs(filters)
+  }
+
+  FlaskWebServer --> UIComponents : uses
+  FlaskWebServer --> APIClient : uses
+}
+
+package "Core Container" {
+  class MainApplication {
+    + initialize()
+    + run()
+  }
+
+  class APIServer {
+    - app: Flask
+    + run()
+    + route_certificates()
+    + route_generate_certificate()
+    + route_renew_certificate()
+    + route_revoke_certificate()
+    + route_logs()
+  }
+
+  class CertificateManager {
+    + list_certificates()
+    + generate_certificate(params)
+    + renew_certificate(cert_id, duration)
+    + revoke_certificate(cert_id)
+  }
+
+  MainApplication --> APIServer : initializes
+  MainApplication --> CertificateManager : uses
+  MainApplication --> Logger : uses
+
+  APIServer --> CertificateManager : uses
+  APIServer --> Logger : uses
+
+  CertificateManager --> CLIWrapper : uses
+  CertificateManager --> Logger : uses
+}
+
+package "AutoSetup Component" {
+  class AutoSetup {
+    + install_stepca()
+    + setup_stepca()
+    + create_root_certificate()
+    + prepare_mtls_certificates()
+    + run_docker_compose()
+  }
+
+  AutoSetup --> CLIWrapper : uses
+  AutoSetup --> Logger : uses
+}
+
+
+package "Host System" {
+    rectangle "step-ca CLI" as stepca {
+    }
+}
+
+CLIWrapper --> stepca : executes commands
+
+APIClient ..> APIServer : communicates via mTLS
+
+@enduml
+```
