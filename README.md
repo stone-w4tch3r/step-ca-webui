@@ -62,96 +62,19 @@ All on one page
 - Web app auth is provided via third-party proxy, not required for this project
 
 ---
+
 # Architecture
 
 ### Overview
 Diagram describes general architecture of the application. [Source PUML code](docs/architecture-overview.puml)
-
-![architecture overview]()
-
+![architecture overview](https://plantuml.com/plantuml/svg/5Sqx3WCX30RXFgT83W0kaYhLNeKrLa3YWSplvVfXgz5NpJ4H55RBuvKR5ujYMfu96FDBf67vNqQoqwOezmPfyDmhJVGcRdt0wQrRCXm7j-IqJ3LiAyNEau9ooX26gRX-YLvPbX_ty90MT_y0)
 
 ### UI Mockup
-Main page:
-```
-+--------------------------------------------+
-|  Logo    [Dashboard]    [Logs]    [Menu]   |
-+--------------------------------------------+
-|                                            |
-|  Certificate Management                    |
-|  +--------------------------------------+  |
-|  | List of Certificates                 |  |
-|  | +--------------------------------+   |  |
-|  | | Cert Name | Status  | Actions  |   |  |
-|  | |-----------|---------|----------|   |  |
-|  | | Cert 1    | Active  | [Renew]  |   |  |
-|  | |           |         | [Revoke] |   |  |
-|  | |-----------|---------|----------|   |  |
-|  | | Cert 2    | Expired | [Delete] |   |  |
-|  | +--------------------------------+   |  |
-|  |                                      |  |
-|  |     [Generate New Certificate]       |  |
-|  +--------------------------------------+  |
-+--------------------------------------------+
-```
-
-Generate cert modal dialog:
-```
-+------------------------------------------+
-|  Generate New certificate                |
-|  +------------------------------------+  |
-|  | Key Name: __                       |  |
-|  | Key Type: >RSA                     |  | #dropdown: RSA etc
-|  | Duration: ___ >days                |  | #dropdown: minutes, hours etc
-|  |                                    |  |
-|  | Command that will be executed:     |  |
-|  | [Click here to reload preview]     |  |
-|  | [Execute!]                         |  | # if preview is loaded and all fields are filled
-|  | <$ step-ca command ...          >  |  |
-|  |                                    |  |
-|  | Logs:            <In progress...>  |  |
-|  | <Action-specific logs appear here> |  |
-|  +------------------------------------+  |
-+------------------------------------------+
-```
-
-Logs page:
-```
-+-----------------------------------------------------------------+
-|  Logo    [Dashboard]    [Logs]    [Menu]                        |
-+-----------------------------------------------------------------+
-|                                                                 |
-|  Logs and Command History                                       |
-|  +-----------------------------------------------------------+  |
-|  | Filters:                                                  |  |
-|  | Severity: [All v]  Type: [All v]                          |  |
-|  | Date Range: [From] [To]  [Apply]                          |  |
-|  |                                                           |  |
-|  | Search: [____________] [Search]                           |  |
-|  |                                                           |  |
-|  | +-------------------------------------------------------+ |  |
-|  | | EntryID | Timestamp | Severity | TraceID | Message    | |  |
-|  | |---------|-----------|----------|---------|------------| |  |
-|  | | 00002   | 2023-08-1 | INFO     | abc123  | Generating | |  |
-|  | |         | 7 10:15   |          |         | new cert   | |  |
-|  | |         | $ step ca certificate ...                   | |  |
-|  | |         | [Click to see command output...]            | |  |
-|  | |---------|---------------------------------------------| |  |
-|  | | 00003   | 2023-08-1 | WARN     | def456  | Cert not   | |  |
-|  | |         | 7 10:14   |          |         | exists     | |  |
-|  | |---------|--------------------------------|------------| |  |
-|  | | 00004   | 2023-08-1 | DEBUG    | def456  | Request    | |  |
-|  | |         | 7 10:13   |          |         | revoke     | |  |
-|  | |---------|--------------------------------|------------| |  |
-|  | | 00005   | 2023-08-1 | ERROR    | ghi789  | Permission | |  |
-|  | |         | 7 10:12   |          |         | denied     | |  |
-|  | +-------------------------------------------------------+ |  |
-|  |                                                           |  |
-|  | [Load More]                                               |  |
-|  +-----------------------------------------------------------+  |
-+-----------------------------------------------------------------+
-```
+See [docs/ui-mockups.md](docs/ui-mockups.md) for ASCII mockups of the UI.
 
 ### Logging
+Convenient logging allows system to be transparent about underlying CLI wrapping. 
+This is important due to unstable nature of CLI tools. 
 
 Log entry structure:
 ```python
@@ -188,14 +111,14 @@ class LogEntry:
 - Scoped logging (trace_id) implemented for tracking actions across multiple log entries
 
 ### Core API
-See [docs/core-api.md](docs/core-api.md) for OpenAPI specification.
+See [docs/core-api.yaml](docs/core-api.yaml) for Core component OpenAPI specification.
 
 ### Class Diagram
 Describes the class structure of the application's python components. [Source PUML code](docs/class-diagram.puml)
-
 ![class diagram](https://plantuml.com/plantuml/svg/5Ssz3GCX343XFbCa0t0kaYhLhU8pre441lb7h1zIFNtLEyrHFNfxlAfGYyoXxLdSftq15DTnLoznXR7I46VnWqO7yo6SriUfl7MBPo9CYw-eq75R8Gyoe8PcALUy5Vin_wEJ9U_-0000)
 
 ### File structure
+This is final file structure of the project:
 ```
 project_root/
 │
@@ -204,8 +127,8 @@ project_root/
 │
 ├── docs/
 │   ├── class-diagram.puml
-│   ├── core-api.md
-│   └── ...
+│   ├── core-api.yaml
+│   └── architecture-overview.puml
 ├── shared/
 │   ├── __init__.py
 │   ├── cli_wrapper.py
