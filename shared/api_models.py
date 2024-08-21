@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from shared.models import LogSeverity, KeyType
 
 
-class Certificate(BaseModel):
+class CertificateDTO(BaseModel):
     id: str
     name: str
     status: str
@@ -20,7 +20,7 @@ class CertificateGenerateRequest(BaseModel):
     duration: int = Field(..., gt=0, description="Duration in seconds")
 
 
-class CommandPreview(BaseModel):
+class CommandPreviewDTO(BaseModel):
     command: str
 
 
@@ -49,20 +49,20 @@ class CertificateRevokeResult(BaseModel):
     revocationDate: datetime
 
 
-class CommandInfo(BaseModel):
+class CommandInfoDTO(BaseModel):
     command: str
     output: str
     exitCode: int
     action: str
 
 
-class LogEntry(BaseModel):
+class LogEntryDTO(BaseModel):
     entryId: int = Field(..., gt=0)
     timestamp: datetime
     severity: LogSeverity
     message: str
     traceId: uuid.UUID
-    commandInfo: Optional[CommandInfo]
+    commandInfo: Optional[CommandInfoDTO]
 
 
 class LogsRequest(BaseModel):

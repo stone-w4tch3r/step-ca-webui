@@ -1,20 +1,28 @@
 import enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 
 
 class LogSeverity(enum.StrEnum):
     DEBUG = "DEBUG"
     INFO = "INFO"
-    WARN = "WARN"
+    WARNING = "WARN"
     ERROR = "ERROR"
+
+    @staticmethod
+    def as_list() -> List[str]:  # TODO use
+        return [s.upper() for s in LogSeverity]
 
 
 class KeyType(enum.StrEnum):
     RSA = "RSA"
     ECDSA = "ECDSA"
+
+    @staticmethod
+    def as_list() -> List[str]:  # TODO use
+        return [s.upper() for s in KeyType]
 
 
 @dataclass
@@ -27,9 +35,9 @@ class CommandInfo:
 
 @dataclass
 class LogEntry:
-    entry_id: int
     timestamp: datetime
+    entry_id: int
     severity: LogSeverity
-    message: str
     trace_id: UUID
+    message: str
     command_info: Optional[CommandInfo] = None

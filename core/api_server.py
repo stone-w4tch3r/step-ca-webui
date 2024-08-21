@@ -7,16 +7,16 @@ from fastapi.responses import PlainTextResponse
 from core.certificate_manager import CertificateManager
 from core.trace_id_handler import TraceIdHandler
 from shared.api_models import (
-    Certificate,
+    CertificateDTO,
     CertificateGenerateRequest,
     CertificateGenerateResult,
     CertificateRenewResult,
     CertificateRevokeResult,
-    CommandPreview,
-    LogEntry,
+    CommandPreviewDTO,
+    LogEntryDTO,
     LogsRequest
 )
-from shared.logger import Logger
+from shared.logger import Logger, LogsFilter, Paging
 from shared.models import LogSeverity
 
 
@@ -45,15 +45,15 @@ class APIServer:
         uvicorn.run(self._app, host="0.0.0.0", port=self._port)
 
     def _setup_routes(self):
-        @self._app.get("/certificates", response_model=Union[List[Certificate], CommandPreview])
-        async def list_certificates(preview: bool = Query(...)) -> Union[List[Certificate], CommandPreview]:
+        @self._app.get("/certificates", response_model=Union[List[CertificateDTO], CommandPreviewDTO])
+        async def list_certificates(preview: bool = Query(...)) -> Union[List[CertificateDTO], CommandPreviewDTO]:
             if preview:
                 command = self._cert_manager.preview_list_certificates()
-                return CommandPreview(command=command)
+                return CommandPreviewDTO(command=command)
             certs = self._cert_manager.list_certificates()
 
             return [
-                Certificate(
+                CertificateDTO(
                     id=cert.id,
                     name=cert.name,
                     status=cert.status,
@@ -61,14 +61,14 @@ class APIServer:
                 ) for cert in certs
             ]
 
-        @self._app.post("/certificates/generate", response_model=Union[CertificateGenerateResult, CommandPreview])
+        @self._app.post("/certificates/generate", response_model=Union[CertificateGenerateResult, CommandPreviewDTO])
         async def generate_certificate(
             cert_request: CertificateGenerateRequest,
             preview: bool = Query(...)
         ):
             if preview:
                 command = self._cert_manager.preview_generate_certificate(cert_request.keyName, cert_request.keyType, cert_request.duration)
-                return CommandPreview(command=command)
+                return CommandPreviewDTO(command=command)
             cert = self._cert_manager.generate_certificate(cert_request.keyName, cert_request.keyType, cert_request.duration)
 
             return CertificateGenerateResult(
@@ -80,7 +80,7 @@ class APIServer:
                 expirationDate=cert.expiration_date
             )
 
-        @self._app.post("/certificates/renew", response_model=Union[CertificateRenewResult, CommandPreview])
+        @self._app.post("/certificates/renew", response_model=Union[CertificateRenewResult, CommandPreviewDTO])
         async def renew_certificate(
             certId: str = Query(...),
             duration: int = Query(..., description="Duration in seconds"),
@@ -88,7 +88,7 @@ class APIServer:
         ):
             if preview:
                 command = self._cert_manager.preview_renew_certificate(certId, duration)
-                return CommandPreview(command=command)
+                return CommandPreviewDTO(command=command)
             cert = self._cert_manager.renew_certificate(certId, duration)
 
             return CertificateRenewResult(
@@ -99,14 +99,14 @@ class APIServer:
                 newExpirationDate=cert.new_expiration_date
             )
 
-        @self._app.post("/certificates/revoke", response_model=Union[CertificateRevokeResult, CommandPreview])
+        @self._app.post("/certificates/revoke", response_model=Union[CertificateRevokeResult, CommandPreviewDTO])
         async def revoke_certificate(
             certId: str = Query(...),
             preview: bool = Query(...)
         ):
             if preview:
                 command = self._cert_manager.preview_revoke_certificate(certId)
-                return CommandPreview(command=command)
+                return CommandPreviewDTO(command=command)
             cert = self._cert_manager.revoke_certificate(certId)
 
             return CertificateRevokeResult(
@@ -117,13 +117,13 @@ class APIServer:
                 revocationDate=cert.revocation_date
             )
 
-        @self._app.get("/logs/single", response_model=LogEntry)
+        @self._app.get("/logs/single", response_model=LogEntryDTO)
         async def get_log_entry(logId: int = Query(..., gt=0)):
             log_entry = self._logger.get_log_entry(logId)
             if not log_entry:
                 raise HTTPException(status_code=404, detail="Log entry not found")
 
-            return LogEntry(
+            return LogEntryDTO(
                 entryId=log_entry.entry_id,
                 timestamp=log_entry.timestamp,
                 severity=log_entry.severity,
@@ -132,12 +132,15 @@ class APIServer:
                 commandInfo=log_entry.command_info
             )
 
-        @self._app.post("/logs", response_model=List[LogEntry])
-        async def get_logs(logs_request: LogsRequest) -> List[LogEntry]:
-            logs = self._logger.get_logs(logs_request.model_dump())
+        @self._app.post("/logs", response_model=List[LogEntryDTO])
+        async def get_logs(logs_request: LogsRequest) -> List[LogEntryDTO]:
+            logs = self._logger.get_logs(
+                LogsFilter(trace_id=logs_request.traceId, commands_only=logs_request.commandsOnly, severity=logs_request.severity),
+                Paging(page=logs_request.page, page_size=logs_request.pageSize)
+            )
 
             return [
-                LogEntry(
+                LogEntryDTO(
                     entryId=log.entry_id,
                     timestamp=log.timestamp,
                     severity=log.severity,
