@@ -15,7 +15,7 @@ class Certificate(BaseModel):
 
 
 class CertificateGenerateRequest(BaseModel):
-    keyName: str
+    keyName: str = Field(..., pattern=r"^[a-zA-Z0-9_-]+$", description="Alphanumeric characters, dashes, and underscores only")
     keyType: KeyType
     duration: int = Field(..., gt=0, description="Duration in seconds")
 
