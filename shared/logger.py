@@ -2,26 +2,44 @@ import json
 import logging
 import re
 import uuid
-from dataclasses import dataclass
+from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Dict, List, Optional
 from uuid import UUID
+
+from pydantic import BaseModel
 
 from core.trace_id_handler import TraceIdHandler
 from .models import LogEntry, LogSeverity, CommandInfo
 
 
-@dataclass
-class LogsFilter:
+class LogsFilter(BaseModel):
     trace_id: Optional[uuid.UUID]
     commands_only: bool
     severity: List[LogSeverity]
 
 
-@dataclass
-class Paging:
+class Paging(BaseModel):
     page: int
     page_size: int
+
+
+class ILogProvider(ABC):
+    @abstractmethod
+    def write_log(self, log_entry: LogEntry) -> None:
+        pass
+
+    @abstractmethod
+    def read_logs(self, filters: LogsFilter, paging: Paging) -> List[LogEntry]:
+        pass
+
+    @abstractmethod
+    def read_log_entry(self, log_id: int) -> Optional[LogEntry]:
+        pass
+
+    @abstractmethod
+    def get_next_entry_id(self) -> int:
+        pass
 
 
 class Logger:
@@ -46,7 +64,7 @@ class Logger:
             trace_id=trace_id,
             command_info=command_info
         )
-        self._write_log_entry(log_entry)
+        self._write(log_entry)
         return log_entry.entry_id
 
     def log_with_trace(
@@ -64,7 +82,7 @@ class Logger:
             trace_id=trace_id,
             command_info=command_info
         )
-        self._write_log_entry(log_entry)
+        self._write(log_entry)
         return log_entry.entry_id
 
     def get_logs(self, filters: LogsFilter, paging: Paging) -> List[LogEntry]:
@@ -95,18 +113,22 @@ class Logger:
             self.log_scoped(LogSeverity.WARNING, f"File not found when trying to read log entry: {self._json_file}")
         return None
 
-    def _write_log_entry(self, log_entry: LogEntry) -> None:
+    def _write(self, log_entry: LogEntry) -> None:
+        self._write_native(log_entry)
+        self._write_json(log_entry)
+
+    @staticmethod
+    def _write_native(log_entry: LogEntry) -> None:
         log_message = f"{log_entry.timestamp} - {log_entry.severity.name} - [TraceID: {log_entry.trace_id}] - {log_entry.message}"
         if log_entry.command_info:
             log_message += f" - Command: {log_entry.command_info.command}"
 
         logging.log(logging.getLevelName(log_entry.severity.name), log_message)
-        self._write_json_log_entry(log_entry)
 
-    def _write_json_log_entry(self, log_entry: LogEntry) -> None:
+    def _write_json(self, log_entry: LogEntry) -> None:
         json_entry = {
             "timestamp": log_entry.timestamp.isoformat(),
-            "entry_id": _with_leading_zeros(log_entry.entry_id),
+            "entry_id": log_entry.entry_id,
             "severity": log_entry.severity.name,
             "trace_id": str(log_entry.trace_id),
             "message": _escape_quotes(log_entry.message),
@@ -128,7 +150,14 @@ class Logger:
             last_entry = json.loads(last_line)
             return last_entry["entry_id"] + 1
         except (IndexError, FileNotFoundError, KeyError) as e:
-            self.log_scoped(LogSeverity.WARNING, f"Failed to get next entry ID: {e}")
+            # self.log_scoped(LogSeverity.WARNING, f"Failed to get next entry ID: {e}")
+            self._write_native(LogEntry(
+                entry_id=1,
+                timestamp=datetime.now(),
+                severity=LogSeverity.WARNING,
+                message=f"Failed to get next entry ID: {e}",
+                trace_id=uuid.UUID("00000000-0000-0000-0000-000000000000")
+            ))
             return 1
 
     def _create_log_entry_from_data(self, log_data: Dict) -> LogEntry | None:
@@ -167,11 +196,3 @@ def _parse_datetime(timestamp_str: str) -> datetime:
 
 def _escape_quotes(text: str) -> str:
     return re.sub(r'"', r'\\"', text)
-
-
-def _with_leading_zeros(number: int) -> str:
-    length = 10 \
-        if str(number).__len__() < 10 \
-        else str(number).__len__()
-
-    return str(number).zfill(length)

@@ -1,8 +1,9 @@
 import enum
-from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
+
+from pydantic import BaseModel
 
 
 class LogSeverity(enum.StrEnum):
@@ -25,16 +26,14 @@ class KeyType(enum.StrEnum):
         return [s.upper() for s in KeyType]
 
 
-@dataclass
-class CommandInfo:
+class CommandInfo(BaseModel):
     command: str
     output: str
     exit_code: int
     action: str
 
 
-@dataclass
-class LogEntry:
+class LogEntry(BaseModel):
     timestamp: datetime
     entry_id: int
     severity: LogSeverity

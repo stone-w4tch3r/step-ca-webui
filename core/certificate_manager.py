@@ -1,14 +1,14 @@
-from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import List
+
+from pydantic import BaseModel
 
 from shared.cli_wrapper import CLIWrapper
 from shared.logger import Logger, LogSeverity
 from shared.models import CommandInfo, KeyType
 
 
-@dataclass
-class CertificateResult:
+class CertificateResult(BaseModel):
     success: bool
     message: str
     log_entry_id: int
@@ -19,8 +19,7 @@ class CertificateResult:
     revocation_date: datetime = None
 
 
-@dataclass
-class Certificate:
+class Certificate(BaseModel):
     id: str
     name: str
     status: str

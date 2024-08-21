@@ -1,6 +1,6 @@
-import subprocess
 import shlex
-from typing import List, Tuple
+import subprocess
+from typing import Tuple
 
 
 class CLIWrapper:
