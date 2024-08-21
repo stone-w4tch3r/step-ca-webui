@@ -171,3 +171,4 @@ project_root/
 # TODO
 - [ ] Adjust class diagram after finalizing the project
 - [ ] Prevent simultaneous actions calls 
+- [ ] Add 'default' error values to the API spec (plaintext response)

@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Dict, List, Optional
 from uuid import UUID
 
-from core.api_server import TraceIdHandler
+from core.trace_id_handler import TraceIdHandler
 from .models import LogEntry, LogSeverity, CommandInfo
 
 

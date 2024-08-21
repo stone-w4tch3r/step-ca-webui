@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: FastAPI
-  version: 0.1.0
-
+  title: Step-CA Management API
+  description: API for managing step-ca Certificate Authority
+  version: 0.0.1
 paths:
   /certificates:
     get:
@@ -33,13 +33,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-        'default':
-          description: Error
-          content:
-            text/plain:
-              schema:
-                type: string
-
   /certificates/generate:
     post:
       summary: Generate Certificate
@@ -211,16 +204,16 @@ components:
         status:
           type: string
           title: Status
-        expiration_date:
+        expirationDate:
           type: string
           format: date-time
-          title: Expiration Date
+          title: Expirationdate
       type: object
       required:
         - id
         - name
         - status
-        - expiration_date
+        - expirationDate
       title: Certificate
     CertificateGenerateRequest:
       properties:

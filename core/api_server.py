@@ -1,6 +1,3 @@
-import threading
-import uuid
-from contextlib import contextmanager
 from typing import List, Union
 
 import uvicorn
@@ -8,6 +5,7 @@ from fastapi import FastAPI, Query, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 
 from core.certificate_manager import CertificateManager
+from core.trace_id_handler import TraceIdHandler
 from shared.api_models import (
     Certificate,
     CertificateGenerateRequest,
@@ -37,8 +35,7 @@ class APIServer:
             redoc_url="/redoc",
             servers=[
                 {"url": f"http://localhost:{port}", "description": "Local development environment"},
-                {"url": prod_url, "description": "Production environment"} if prod_url else None
-            ]
+            ] + [{"url": prod_url, "description": "Production environment"}] if prod_url else []
         )
 
         self._setup_routes()
@@ -116,7 +113,7 @@ class APIServer:
                 revocationDate=cert["revocationDate"]
             )
 
-        @self._app.post("/logs/single", response_model=LogEntry)
+        @self._app.get("/logs/single", response_model=LogEntry)
         async def get_log_entry(logId: int = Query(..., gt=0)):
             log_entry = self._logger.get_log_entry(logId)
             if not log_entry:
@@ -156,20 +153,3 @@ class APIServer:
             traceId=log.trace_id,
             commandInfo=log.command_info
         )
-
-
-class TraceIdHandler:
-    _thread_local = threading.local()
-
-    @staticmethod
-    @contextmanager
-    def logging_scope():
-        TraceIdHandler._thread_local.trace_id = uuid.uuid4()
-        try:
-            yield
-        finally:
-            del TraceIdHandler._thread_local.trace_id
-
-    @staticmethod
-    def get_current_trace_id() -> uuid.UUID | None:
-        return getattr(TraceIdHandler._thread_local, 'trace_id', None)
