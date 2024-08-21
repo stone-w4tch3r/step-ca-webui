@@ -79,26 +79,41 @@ class LogsRequest(BaseModel):
     pageSize: int = Field(..., gt=0)
 
 
-_app = FastAPI()
+_app: FastAPI
 _cert_manager: CertificateManager
 _logger: Logger
 
 
-def setup(cert_manager: CertificateManager, logger: Logger) -> None:
+# TODO fix DI
+def run(
+    cert_manager: CertificateManager,
+    logger: Logger,
+    version: str,
+    port: int,
+    prod_url: str = None
+) -> None:
+
     global _cert_manager
     global _logger
+    global _app
+
     _cert_manager = cert_manager
     _logger = logger
 
+    _app = FastAPI(
+        title="Step-CA Management API",
+        version=version,
+        description="API for managing step-ca Certificate Authority",
+        openapi_url="/openapi.json",
+        docs_url="/swagger",
+        redoc_url="/redoc",
+        servers=[
+            {"url": f"http://localhost:{port}", "description": "Local development environment"},
+            {"url": prod_url, "description": "Production environment"} if prod_url else None
+        ]
+    )
 
-def run(
-    host: str = "0.0.0.0",
-    port: int = 5000
-) -> None:
-    if not _cert_manager or not _logger:
-        raise RuntimeError("API server not set up")
-
-    uvicorn.run(_app, host=host, port=port)
+    uvicorn.run(_app, host="0.0.0.0", port=port)
 
 
 @_app.get("/certificates", response_model=Union[List[Certificate], CommandPreview])

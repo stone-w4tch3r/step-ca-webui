@@ -1,47 +1,56 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
-  title: Step-CA Management API
-  version: 0.0.1
-  description: API for managing step-ca Certificate Authority
-
-servers:
-  - url: http://localhost:5000/
+  title: FastAPI
+  version: 0.1.0
 
 paths:
   /certificates:
     get:
-      summary: List all certificates
+      summary: List Certificates
+      operationId: list_certificates_certificates_get
       parameters:
         - name: preview
           in: query
+          required: true
           schema:
             type: boolean
+            title: Preview
       responses:
         '200':
-          description: Successful response
+          description: Successful Response
           content:
             application/json:
               schema:
-                oneOf:
+                anyOf:
                   - type: array
                     items:
                       $ref: '#/components/schemas/Certificate'
                   - $ref: '#/components/schemas/CommandPreview'
+                title: Response List Certificates Certificates Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
         'default':
           description: Error
           content:
             text/plain:
               schema:
                 type: string
-  
+
   /certificates/generate:
     post:
-      summary: Generate certificate
+      summary: Generate Certificate
+      operationId: generate_certificate_certificates_generate_post
       parameters:
         - name: preview
           in: query
+          required: true
           schema:
             type: boolean
+            title: Preview
       requestBody:
         required: true
         content:
@@ -50,256 +59,407 @@ paths:
               $ref: '#/components/schemas/CertificateGenerateRequest'
       responses:
         '200':
-          description: Command preview or generation result
+          description: Successful Response
           content:
             application/json:
               schema:
-                oneOf:
+                anyOf:
                   - $ref: '#/components/schemas/CertificateGenerateResult'
                   - $ref: '#/components/schemas/CommandPreview'
-        'default':
-          description: Error
+                title: Response Generate Certificate Certificates Generate Post
+        '422':
+          description: Validation Error
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-
+                $ref: '#/components/schemas/HTTPValidationError'
   /certificates/renew:
     post:
-      summary: Preview renew certificate command
+      summary: Renew Certificate
+      operationId: renew_certificate_certificates_renew_post
       parameters:
         - name: certId
           in: query
           required: true
           schema:
             type: string
+            title: Certid
         - name: duration
           in: query
           required: true
           schema:
             type: integer
-            description: "Duration in seconds"
+            description: Duration in seconds
+            title: Duration
+          description: Duration in seconds
         - name: preview
           in: query
+          required: true
           schema:
             type: boolean
+            title: Preview
       responses:
         '200':
-          description: Command preview
+          description: Successful Response
           content:
             application/json:
               schema:
-                oneOf:
+                anyOf:
                   - $ref: '#/components/schemas/CertificateRenewResult'
                   - $ref: '#/components/schemas/CommandPreview'
-        'default':
-          description: Error
+                title: Response Renew Certificate Certificates Renew Post
+        '422':
+          description: Validation Error
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-
+                $ref: '#/components/schemas/HTTPValidationError'
   /certificates/revoke:
     post:
-      summary: Preview revoke certificate command
+      summary: Revoke Certificate
+      operationId: revoke_certificate_certificates_revoke_post
       parameters:
         - name: certId
           in: query
           required: true
           schema:
             type: string
+            title: Certid
         - name: preview
           in: query
+          required: true
           schema:
             type: boolean
+            title: Preview
       responses:
         '200':
-          description: Command preview
+          description: Successful Response
           content:
             application/json:
               schema:
-                oneOf:
+                anyOf:
                   - $ref: '#/components/schemas/CertificateRevokeResult'
                   - $ref: '#/components/schemas/CommandPreview'
-        'default':
-          description: Error
+                title: Response Revoke Certificate Certificates Revoke Post
+        '422':
+          description: Validation Error
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-
+                $ref: '#/components/schemas/HTTPValidationError'
   /logs/single:
     get:
-      summary: Get log entry by ID
+      summary: Get Log Entry
+      operationId: get_log_entry_logs_single_get
       parameters:
         - name: logId
           in: query
           required: true
           schema:
             type: integer
+            exclusiveMinimum: 0
+            title: Logid
       responses:
         '200':
-          description: Successful response
+          description: Successful Response
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/LogEntry'
-        'default':
-          description: Error
+        '422':
+          description: Validation Error
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-
-
+                $ref: '#/components/schemas/HTTPValidationError'
   /logs:
     post:
-      summary: Retrieve logs
+      summary: Get Logs
+      operationId: get_logs_logs_post
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/LogsRequest'
+        required: true
       responses:
         '200':
-          description: Successful response
+          description: Successful Response
           content:
             application/json:
               schema:
-                type: array
                 items:
                   $ref: '#/components/schemas/LogEntry'
-        'default':
-          description: Error
+                type: array
+                title: Response Get Logs Logs Post
+        '422':
+          description: Validation Error
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
     Certificate:
-      type: object
       properties:
         id:
           type: string
+          title: Id
         name:
           type: string
+          title: Name
         status:
           type: string
-          enum: [ Active, Expired, Revoked ]
-        expirationDate:
+          title: Status
+        expiration_date:
           type: string
           format: date-time
-
-    CertificateGenerateRequest:
+          title: Expiration Date
       type: object
+      required:
+        - id
+        - name
+        - status
+        - expiration_date
+      title: Certificate
+    CertificateGenerateRequest:
       properties:
         keyName:
           type: string
+          title: Keyname
         keyType:
-          type: string
-          enum: [ RSA, ECDSA ]
+          $ref: '#/components/schemas/KeyType'
         duration:
           type: integer
-
-    CommandPreview:
+          exclusiveMinimum: 0
+          title: Duration
+          description: Duration in seconds
       type: object
-      properties:
-        command:
-          type: string
-
+      required:
+        - keyName
+        - keyType
+        - duration
+      title: CertificateGenerateRequest
     CertificateGenerateResult:
-      type: object
       properties:
         success:
           type: boolean
+          title: Success
         message:
           type: string
+          title: Message
         logEntryId:
           type: integer
+          exclusiveMinimum: 0
+          title: Logentryid
         certificateId:
           type: string
+          title: Certificateid
         certificateName:
           type: string
+          title: Certificatename
         expirationDate:
           type: string
           format: date-time
-
-    CertificateRenewResult:
+          title: Expirationdate
       type: object
+      required:
+        - success
+        - message
+        - logEntryId
+        - certificateId
+        - certificateName
+        - expirationDate
+      title: CertificateGenerateResult
+    CertificateRenewResult:
       properties:
         success:
           type: boolean
+          title: Success
         message:
           type: string
+          title: Message
         logEntryId:
           type: integer
+          exclusiveMinimum: 0
+          title: Logentryid
         certificateId:
           type: string
+          title: Certificateid
         newExpirationDate:
           type: string
           format: date-time
-
-    CertificateRevokeResult:
+          title: Newexpirationdate
       type: object
+      required:
+        - success
+        - message
+        - logEntryId
+        - certificateId
+        - newExpirationDate
+      title: CertificateRenewResult
+    CertificateRevokeResult:
       properties:
         success:
           type: boolean
+          title: Success
         message:
           type: string
+          title: Message
         logEntryId:
           type: integer
+          exclusiveMinimum: 0
+          title: Logentryid
         certificateId:
           type: string
+          title: Certificateid
         revocationDate:
           type: string
           format: date-time
-    
-    LogsRequest:
+          title: Revocationdate
       type: object
+      required:
+        - success
+        - message
+        - logEntryId
+        - certificateId
+        - revocationDate
+      title: CertificateRevokeResult
+    CommandInfo:
       properties:
-        traceId:
+        command:
           type: string
-          description: "UUID4 format"
-          nullable: true
-        commandsOnly:
-          type: boolean
-        severity:
-          type: array
-          items:
-            type: string
-            enum: [ DEBUG, INFO, WARN, ERROR ]
-        page:
+          title: Command
+        output:
+          type: string
+          title: Output
+        exitCode:
           type: integer
-        pageSize:
-          type: integer
-
-    LogEntry:
+          title: Exitcode
+        action:
+          type: string
+          title: Action
       type: object
+      required:
+        - command
+        - output
+        - exitCode
+        - action
+      title: CommandInfo
+    CommandPreview:
+      properties:
+        command:
+          type: string
+          title: Command
+      type: object
+      required:
+        - command
+      title: CommandPreview
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    KeyType:
+      type: string
+      enum:
+        - RSA
+        - ECDSA
+      title: KeyType
+    LogEntry:
       properties:
         entryId:
           type: integer
+          exclusiveMinimum: 0
+          title: Entryid
         timestamp:
           type: string
           format: date-time
+          title: Timestamp
         severity:
-          type: string
-          enum: [ DEBUG, INFO, WARN, ERROR ]
+          $ref: '#/components/schemas/LogSeverity'
         message:
           type: string
+          title: Message
         traceId:
           type: string
-          description: "UUID format"
+          format: uuid
+          title: Traceid
         commandInfo:
-          description: Contains command execution info, if entry is related to command
-          nullable: true
-          type: object
-          properties:
-            command:
-              type: string
-            output:
-              type: string
-            exitCode:
-              type: integer
+          anyOf:
+            - $ref: '#/components/schemas/CommandInfo'
+            - type: 'null'
+      type: object
+      required:
+        - entryId
+        - timestamp
+        - severity
+        - message
+        - traceId
+        - commandInfo
+      title: LogEntry
+    LogSeverity:
+      type: string
+      enum:
+        - DEBUG
+        - INFO
+        - WARN
+        - ERROR
+      title: LogSeverity
+    LogsRequest:
+      properties:
+        traceId:
+          anyOf:
+            - type: string
+              format: uuid
+            - type: 'null'
+          title: Traceid
+        commandsOnly:
+          type: boolean
+          title: Commandsonly
+        severity:
+          items:
+            $ref: '#/components/schemas/LogSeverity'
+          type: array
+          title: Severity
+        page:
+          type: integer
+          exclusiveMinimum: 0
+          title: Page
+        pageSize:
+          type: integer
+          exclusiveMinimum: 0
+          title: Pagesize
+      type: object
+      required:
+        - traceId
+        - commandsOnly
+        - severity
+        - page
+        - pageSize
+      title: LogsRequest
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError
