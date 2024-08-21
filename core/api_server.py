@@ -34,8 +34,8 @@ class APIServer:
             docs_url="/swagger",
             redoc_url="/redoc",
             servers=[
-                {"url": f"http://localhost:{port}", "description": "Local development environment"},
-            ] + [{"url": prod_url, "description": "Production environment"}] if prod_url else []
+                        {"url": f"http://localhost:{port}", "description": "Local development environment"},
+                    ] + [{"url": prod_url, "description": "Production environment"}] if prod_url else []
         )
 
         self._setup_routes()
@@ -51,12 +51,13 @@ class APIServer:
                 command = self._cert_manager.preview_list_certificates()
                 return CommandPreview(command=command)
             certs = self._cert_manager.list_certificates()
+
             return [
                 Certificate(
-                    id=cert["id"],
-                    name=cert["name"],
-                    status=cert["status"],
-                    expirationDate=cert["expirationDate"]
+                    id=cert.id,
+                    name=cert.name,
+                    status=cert.status,
+                    expirationDate=cert.expiration_date
                 ) for cert in certs
             ]
 
@@ -66,16 +67,17 @@ class APIServer:
             preview: bool = Query(...)
         ):
             if preview:
-                command = self._cert_manager.preview_generate_certificate(cert_request.dict())
+                command = self._cert_manager.preview_generate_certificate(cert_request.keyName, cert_request.keyType, cert_request.duration)
                 return CommandPreview(command=command)
-            cert = self._cert_manager.generate_certificate(cert_request.dict())
+            cert = self._cert_manager.generate_certificate(cert_request.keyName, cert_request.keyType, cert_request.duration)
+
             return CertificateGenerateResult(
-                success=cert["success"],
-                message=cert["message"],
-                logEntryId=cert["logEntryId"],
-                certificateId=cert["certificateId"],
-                certificateName=cert["certificateName"],
-                expirationDate=cert["expirationDate"]
+                success=cert.success,
+                message=cert.message,
+                logEntryId=cert.log_entry_id,
+                certificateId=cert.certificate_id,
+                certificateName=cert.certificate_name,
+                expirationDate=cert.expiration_date
             )
 
         @self._app.post("/certificates/renew", response_model=Union[CertificateRenewResult, CommandPreview])
@@ -88,12 +90,13 @@ class APIServer:
                 command = self._cert_manager.preview_renew_certificate(certId, duration)
                 return CommandPreview(command=command)
             cert = self._cert_manager.renew_certificate(certId, duration)
+
             return CertificateRenewResult(
-                success=cert["success"],
-                message=cert["message"],
-                logEntryId=cert["logEntryId"],
-                certificateId=cert["certificateId"],
-                newExpirationDate=cert["newExpirationDate"]
+                success=cert.success,
+                message=cert.message,
+                logEntryId=cert.log_entry_id,
+                certificateId=cert.certificate_id,
+                newExpirationDate=cert.new_expiration_date
             )
 
         @self._app.post("/certificates/revoke", response_model=Union[CertificateRevokeResult, CommandPreview])
@@ -105,12 +108,13 @@ class APIServer:
                 command = self._cert_manager.preview_revoke_certificate(certId)
                 return CommandPreview(command=command)
             cert = self._cert_manager.revoke_certificate(certId)
+
             return CertificateRevokeResult(
-                success=cert["success"],
-                message=cert["message"],
-                logEntryId=cert["logEntryId"],
-                certificateId=cert["certificateId"],
-                revocationDate=cert["revocationDate"]
+                success=cert.success,
+                message=cert.message,
+                logEntryId=cert.log_entry_id,
+                certificateId=cert.certificate_id,
+                revocationDate=cert.revocation_date
             )
 
         @self._app.get("/logs/single", response_model=LogEntry)
@@ -118,13 +122,30 @@ class APIServer:
             log_entry = self._logger.get_log_entry(logId)
             if not log_entry:
                 raise HTTPException(status_code=404, detail="Log entry not found")
-            return self._map_log_entry(log_entry)
+
+            return LogEntry(
+                entryId=log_entry.entry_id,
+                timestamp=log_entry.timestamp,
+                severity=log_entry.severity,
+                message=log_entry.message,
+                traceId=log_entry.trace_id,
+                commandInfo=log_entry.command_info
+            )
 
         @self._app.post("/logs", response_model=List[LogEntry])
         async def get_logs(logs_request: LogsRequest) -> List[LogEntry]:
-            logs = self._logger.get_logs(logs_request.dict())
-            logs_mapped = [self._map_log_entry(log) for log in logs]
-            return logs_mapped
+            logs = self._logger.get_logs(logs_request.model_dump())
+
+            return [
+                LogEntry(
+                    entryId=log.entry_id,
+                    timestamp=log.timestamp,
+                    severity=log.severity,
+                    message=log.message,
+                    traceId=log.trace_id,
+                    commandInfo=log.command_info
+                ) for log in logs
+            ]
 
     def _setup_handlers(self):
         @self._app.exception_handler(HTTPException)
@@ -142,14 +163,3 @@ class APIServer:
             async with TraceIdHandler.logging_scope():
                 response = await call_next(request)
             return response
-
-    @staticmethod
-    def _map_log_entry(log) -> LogEntry:
-        return LogEntry(
-            entryId=log.entry_id,
-            timestamp=log.timestamp,
-            severity=log.severity,
-            message=log.message,
-            traceId=log.trace_id,
-            commandInfo=log.command_info
-        )
