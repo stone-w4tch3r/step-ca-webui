@@ -17,6 +17,17 @@ class LogSeverity(enum.StrEnum):
         return [s.upper() for s in LogSeverity]
 
 
+class LogsFilter(BaseModel):
+    trace_id: Optional[UUID]
+    commands_only: bool
+    severity: List[LogSeverity]
+
+
+class Paging(BaseModel):
+    page: int
+    page_size: int
+
+
 class KeyType(enum.StrEnum):
     RSA = "RSA"
     ECDSA = "ECDSA"

@@ -2,45 +2,11 @@ import logging
 import sys
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
-from typing import List, Optional, Dict, Any, Callable
+from typing import List, Optional, Callable
 from uuid import UUID
 
-from pydantic import BaseModel
-
-from .models import LogEntry, LogSeverity, CommandInfo
-
-
-class LogsFilter(BaseModel):
-    trace_id: Optional[UUID]
-    commands_only: bool
-    severity: List[LogSeverity]
-
-
-class Paging(BaseModel):
-    page: int
-    page_size: int
-
-
-class DBHandler:
-    def __init__(self, db_config: Dict[str, Any]):
-        # Initialize database connection here
-        self.db_config = db_config
-
-    def insert_log(self, log_entry: LogEntry) -> None:
-        # Insert log entry into the database
-        pass
-
-    def get_logs(self, filters: LogsFilter, paging: Paging) -> List[LogEntry]:
-        # Retrieve logs from the database based on filters and paging
-        pass
-
-    def get_log_entry(self, log_id: int) -> Optional[LogEntry]:
-        # Retrieve a specific log entry from the database
-        pass
-
-    def get_nex_entry_id(self) -> int:
-        # Retrieve the next available log entry ID from the database
-        pass
+from .models import LogEntry, LogSeverity, CommandInfo, LogsFilter, Paging
+from .db_handler import DBHandler
 
 
 class TraceIdProvider:
@@ -59,8 +25,8 @@ class Logger:
     BACKUP_COUNT = 5
     LOGLEVEL = logging.DEBUG
 
-    def __init__(self, db_handler: DBHandler, trace_id_provider: TraceIdProvider):
-        self.db_handler = db_handler
+    def __init__(self, trace_id_provider: TraceIdProvider):
+        self.db_handler = DBHandler()
         self.trace_id_provider = trace_id_provider
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(self.LOGLEVEL)
@@ -82,11 +48,11 @@ class Logger:
         command_info: Optional[CommandInfo] = None
     ) -> int:
         log_entry = LogEntry(
-            entry_id=self.db_handler.get_nex_entry_id(),
+            entry_id=self.db_handler.get_next_entry_id(),
             timestamp=datetime.now(),
             severity=severity,
             message=message,
-            trace_id=self.trace_id_provider.get_current() or self._UNSCOPED_TRACE_ID,  # TODO: maybe log_unscoped method is also needed?
+            trace_id=self.trace_id_provider.get_current() or self._UNSCOPED_TRACE_ID,
             command_info=command_info
         )
 
