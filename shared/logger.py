@@ -1,9 +1,8 @@
-import json
 import logging
 import sys
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Callable
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -39,37 +38,55 @@ class DBHandler:
         # Retrieve a specific log entry from the database
         pass
 
+    def get_nex_entry_id(self) -> int:
+        # Retrieve the next available log entry ID from the database
+        pass
+
+
+class TraceIdProvider:
+    def __init__(self, get_trace_id: Callable[[], UUID | None]):
+        self.get_trace_id: Callable[[], UUID | None] = get_trace_id
+
+    def get_current(self) -> UUID | None:
+        return self.get_trace_id()
+
 
 class Logger:
     _UNSCOPED_TRACE_ID = UUID("00000000-0000-0000-0000-000000000000")
 
-    def __init__(self, db_handler: DBHandler, log_file: str, max_file_size: int, backup_count: int):
+    LOG_FILE = "application.log"
+    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+    BACKUP_COUNT = 5
+    LOGLEVEL = logging.DEBUG
+
+    def __init__(self, db_handler: DBHandler, trace_id_provider: TraceIdProvider):
         self.db_handler = db_handler
+        self.trace_id_provider = trace_id_provider
         self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(self.LOGLEVEL)
 
         # Console handler
         console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setLevel(logging.DEBUG)
-        console_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        console_handler.setFormatter(console_formatter)
+        console_handler.setLevel(self.LOGLEVEL)
+        console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
         self.logger.addHandler(console_handler)
 
         # File handler with rotation
-        file_handler = RotatingFileHandler(log_file, maxBytes=max_file_size, backupCount=backup_count)
-        file_handler.setLevel(logging.DEBUG)
-        file_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        file_handler.setFormatter(file_formatter)
+        file_handler = RotatingFileHandler(self.LOG_FILE, maxBytes=self.MAX_FILE_SIZE, backupCount=self.BACKUP_COUNT)
+        file_handler.setLevel(self.LOGLEVEL)
+        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
         self.logger.addHandler(file_handler)
 
-    def log(self, severity: LogSeverity, message: str, trace_id: Optional[UUID] = None,
-            command_info: Optional[CommandInfo] = None) -> int:
+    def log(
+        self, severity: LogSeverity, message: str,
+        command_info: Optional[CommandInfo] = None
+    ) -> int:
         log_entry = LogEntry(
-            entry_id=0,  # This will be set by the database
+            entry_id=self.db_handler.get_nex_entry_id(),
             timestamp=datetime.now(),
             severity=severity,
             message=message,
-            trace_id=trace_id or self._UNSCOPED_TRACE_ID,
+            trace_id=self.trace_id_provider.get_current() or self._UNSCOPED_TRACE_ID,  # TODO: maybe log_unscoped method is also needed?
             command_info=command_info
         )
 
