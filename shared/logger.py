@@ -2,14 +2,13 @@ import json
 import logging
 import re
 import uuid
-from abc import ABC, abstractmethod
 from datetime import datetime
+from typing import Callable
 from typing import Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
 
-from core.trace_id_handler import TraceIdHandler
 from .models import LogEntry, LogSeverity, CommandInfo
 
 
@@ -24,26 +23,19 @@ class Paging(BaseModel):
     page_size: int
 
 
-class ILogProvider(ABC):
-    @abstractmethod
-    def write_log(self, log_entry: LogEntry) -> None:
-        pass
+class TraceIdProvider:
+    def __init__(self, get_trace_id: Callable[[], uuid.UUID | None]):
+        self.get_trace_id: Callable[[], uuid.UUID | None] = get_trace_id
 
-    @abstractmethod
-    def read_logs(self, filters: LogsFilter, paging: Paging) -> List[LogEntry]:
-        pass
-
-    @abstractmethod
-    def read_log_entry(self, log_id: int) -> Optional[LogEntry]:
-        pass
-
-    @abstractmethod
-    def get_next_entry_id(self) -> int:
-        pass
+    def get_current(self) -> uuid.UUID | None:
+        return self.get_trace_id()
 
 
 class Logger:
-    def __init__(self):
+    _UNSCOPED_TRACE_ID = uuid.UUID("00000000-0000-0000-0000-000000000000")
+
+    def __init__(self, trace_id_provider: TraceIdProvider):
+        self._trace_id_provider = trace_id_provider
         self._log_file = f"step-ca-webui-{datetime.now().strftime('%Y-%m-%d')}.log"
         self._json_file = f"step-ca-webui-{datetime.now().strftime('%Y-%m-%d')}.json"
         logging.basicConfig(filename=self._log_file, level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -54,7 +46,11 @@ class Logger:
         message: str,
         command_info: Optional[CommandInfo] = None
     ) -> int:
-        trace_id = TraceIdHandler.get_current_trace_id() or uuid.UUID("00000000-0000-0000-0000-000000000000")  # if trace_id not found/no context
+        """
+        This method logs a message with a trace_id if it exists in the current context.
+        Context is managed externally, encapsulated in the TraceIdProvider.
+        """
+        trace_id = self._trace_id_provider.get_current() or self._UNSCOPED_TRACE_ID  # if trace_id not found/no context
 
         log_entry = LogEntry(
             entry_id=self._get_next_entry_id(),
@@ -67,11 +63,10 @@ class Logger:
         self._write(log_entry)
         return log_entry.entry_id
 
-    def log_with_trace(
+    def log_unscoped(
         self,
         severity: LogSeverity,
         message: str,
-        trace_id: UUID,
         command_info: Optional[CommandInfo] = None
     ) -> int:
         log_entry = LogEntry(
@@ -79,7 +74,7 @@ class Logger:
             timestamp=datetime.now(),
             severity=severity,
             message=message,
-            trace_id=trace_id,
+            trace_id=self._UNSCOPED_TRACE_ID,
             command_info=command_info
         )
         self._write(log_entry)
