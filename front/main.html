@@ -1,0 +1,89 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSH Certificate Management - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topbar">
+    <div class="logo">SSH Cert Manager</div>
+    <div>
+        <button class="nav-button">Dashboard</button>
+        <button class="nav-button">Logs</button>
+        <button class="nav-button">Menu</button>
+    </div>
+</div>
+<div class="container">
+    <h1>Certificate Management</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Cert Name</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Cert 1</td>
+            <td>Active</td>
+            <td>
+                <button class="action-button">Renew</button>
+                <button class="action-button">Revoke</button>
+            </td>
+        </tr>
+        <tr>
+            <td>Cert 2</td>
+            <td>Expired</td>
+            <td>
+                <button class="action-button">Delete</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <button id="generateCertBtn" class="generate-button">Generate New Certificate</button>
+</div>
+
+<!-- Modal -->
+<div id="generateCertModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Generate New Certificate</h2>
+        <form id="generateCertForm">
+            <label for="keyName">Key Name:</label>
+            <input type="text" id="keyName" name="keyName" required>
+
+            <label for="keyType">Key Type:</label>
+            <select id="keyType" name="keyType">
+                <option value="RSA">RSA</option>
+                <option value="ECDSA">ECDSA</option>
+                <option value="Ed25519">Ed25519</option>
+            </select>
+
+            <label for="duration">Duration:</label>
+            <input type="number" id="duration" name="duration" required>
+            <select id="durationUnit" name="durationUnit">
+                <option value="minutes">minutes</option>
+                <option value="hours">hours</option>
+                <option value="days">days</option>
+            </select>
+
+            <h3>Command that will be executed:</h3>
+            <button type="button" id="reloadPreview">Click here to reload preview</button>
+            <pre id="commandPreview"></pre>
+
+            <button type="submit" id="executeCommand">Execute!</button>
+        </form>
+        <div class="logs">
+            <h3>Logs:</h3>
+            <div id="logContent"></div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
