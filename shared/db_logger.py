@@ -1,14 +1,16 @@
 import os
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
+
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-from .models import LogEntry, LogSeverity, CommandInfo, LogsFilter, Paging
+from .logger import IDBLogger
+from .models import LogEntry, LogsFilter, Paging
 
 
-class DBHandler:
+class DBLogger(IDBLogger):
     """
-    DBHandler class for managing database operations related to logging.
+    DBLogger class for managing database operations related to logging.
 
     Required environment variables:
     - DB_HOST: The hostname of the database server
