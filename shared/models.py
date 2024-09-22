@@ -18,7 +18,7 @@ class LogSeverity(enum.StrEnum):
 
 
 class LogsFilter(BaseModel):
-    trace_id: Optional[UUID]
+    trace_id: Optional[UUID] = None
     commands_only: bool
     severity: List[LogSeverity]
 
