@@ -90,5 +90,81 @@ class TestDBLogger(unittest.TestCase):
         self.assertIsInstance(next_id, int)
         self.assertGreater(next_id, 0)
 
+    def test_filter_logs_by_severity(self):
+        # Insert logs with different severities
+        severities = [Severity.INFO, Severity.WARNING, Severity.ERROR]
+        for severity in severities:
+            log_entry = LogEntry(
+                timestamp=datetime.now(),
+                severity=severity,
+                message=f"Test log message with {severity.name} severity",
+                trace_id=uuid4(),
+                command_info=None
+            )
+            self.db_logger.insert_log(log_entry)
+
+        # Test filtering by severity
+        filters = LogsFilter(severity=[Severity.WARNING, Severity.ERROR], commands_only=False)
+        paging = Paging(page=1, page_size=10)
+        logs = self.db_logger.get_logs(filters, paging)
+
+        self.assertEqual(len(logs), 2)
+        self.assertIn(logs[0].severity, [Severity.WARNING, Severity.ERROR])
+        self.assertIn(logs[1].severity, [Severity.WARNING, Severity.ERROR])
+
+    def test_filter_logs_by_command(self):
+        # Insert logs with different commands
+        commands = ["command1", "command2", "command3"]
+        for command in commands:
+            log_entry = LogEntry(
+                timestamp=datetime.now(),
+                severity=Severity.INFO,
+                message=f"Test log message for {command}",
+                trace_id=uuid4(),
+                command_info=CommandInfo(command=command, args={})
+            )
+            self.db_logger.insert_log(log_entry)
+
+        # Test filtering by command
+        filters = LogsFilter(commands=["command1", "command3"], commands_only=True)
+        paging = Paging(page=1, page_size=10)
+        logs = self.db_logger.get_logs(filters, paging)
+
+        self.assertEqual(len(logs), 2)
+        self.assertIn(logs[0].command_info.command, ["command1", "command3"])
+        self.assertIn(logs[1].command_info.command, ["command1", "command3"])
+
+    def test_pagination(self):
+        # Insert 10 log entries
+        for i in range(10):
+            log_entry = LogEntry(
+                timestamp=datetime.now(),
+                severity=Severity.INFO,
+                message=f"Test log message {i}",
+                trace_id=uuid4(),
+                command_info=None
+            )
+            self.db_logger.insert_log(log_entry)
+
+        # Test first page
+        filters = LogsFilter(severity=[Severity.INFO], commands_only=False)
+        paging = Paging(page=1, page_size=3)
+        logs = self.db_logger.get_logs(filters, paging)
+        self.assertEqual(len(logs), 3)
+        self.assertEqual(logs[0].message, "Test log message 9")
+
+        # Test second page
+        paging = Paging(page=2, page_size=3)
+        logs = self.db_logger.get_logs(filters, paging)
+        self.assertEqual(len(logs), 3)
+        self.assertEqual(logs[0].message, "Test log message 6")
+
+    def test_no_logs_found(self):
+        # Test when no logs match the filter
+        filters = LogsFilter(severity=[Severity.CRITICAL], commands_only=False)
+        paging = Paging(page=1, page_size=10)
+        logs = self.db_logger.get_logs(filters, paging)
+        self.assertEqual(len(logs), 0)
+
 if __name__ == '__main__':
     unittest.main()
