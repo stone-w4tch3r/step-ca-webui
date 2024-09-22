@@ -24,8 +24,8 @@ paths:
                 anyOf:
                   - type: array
                     items:
-                      $ref: '#/components/schemas/Certificate'
-                  - $ref: '#/components/schemas/CommandPreview'
+                      $ref: '#/components/schemas/CertificateDTO'
+                  - $ref: '#/components/schemas/CommandPreviewDTO'
                 title: Response List Certificates Certificates Get
         '422':
           description: Validation Error
@@ -33,6 +33,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: An unexpected error occurred
   /certificates/generate:
     post:
       summary: Generate Certificate
@@ -58,7 +63,7 @@ paths:
               schema:
                 anyOf:
                   - $ref: '#/components/schemas/CertificateGenerateResult'
-                  - $ref: '#/components/schemas/CommandPreview'
+                  - $ref: '#/components/schemas/CommandPreviewDTO'
                 title: Response Generate Certificate Certificates Generate Post
         '422':
           description: Validation Error
@@ -66,6 +71,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: An unexpected error occurred
   /certificates/renew:
     post:
       summary: Renew Certificate
@@ -99,7 +109,7 @@ paths:
               schema:
                 anyOf:
                   - $ref: '#/components/schemas/CertificateRenewResult'
-                  - $ref: '#/components/schemas/CommandPreview'
+                  - $ref: '#/components/schemas/CommandPreviewDTO'
                 title: Response Renew Certificate Certificates Renew Post
         '422':
           description: Validation Error
@@ -107,6 +117,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: An unexpected error occurred
   /certificates/revoke:
     post:
       summary: Revoke Certificate
@@ -132,7 +147,7 @@ paths:
               schema:
                 anyOf:
                   - $ref: '#/components/schemas/CertificateRevokeResult'
-                  - $ref: '#/components/schemas/CommandPreview'
+                  - $ref: '#/components/schemas/CommandPreviewDTO'
                 title: Response Revoke Certificate Certificates Revoke Post
         '422':
           description: Validation Error
@@ -140,6 +155,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: An unexpected error occurred
   /logs/single:
     get:
       summary: Get Log Entry
@@ -158,13 +178,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LogEntry'
+                $ref: '#/components/schemas/LogEntryDTO'
         '422':
           description: Validation Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: An unexpected error occurred
   /logs:
     post:
       summary: Get Logs
@@ -182,7 +207,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/LogEntry'
+                  $ref: '#/components/schemas/LogEntryDTO'
                 type: array
                 title: Response Get Logs Logs Post
         '422':
@@ -191,9 +216,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              example: An unexpected error occurred
 components:
   schemas:
-    Certificate:
+    CertificateDTO:
       properties:
         id:
           type: string
@@ -214,12 +244,14 @@ components:
         - name
         - status
         - expirationDate
-      title: Certificate
+      title: CertificateDTO
     CertificateGenerateRequest:
       properties:
         keyName:
           type: string
+          pattern: ^[a-zA-Z0-9_-]+$
           title: Keyname
+          description: Alphanumeric characters, dashes, and underscores only
         keyType:
           $ref: '#/components/schemas/KeyType'
         duration:
@@ -318,7 +350,7 @@ components:
         - certificateId
         - revocationDate
       title: CertificateRevokeResult
-    CommandInfo:
+    CommandInfoDTO:
       properties:
         command:
           type: string
@@ -338,8 +370,8 @@ components:
         - output
         - exitCode
         - action
-      title: CommandInfo
-    CommandPreview:
+      title: CommandInfoDTO
+    CommandPreviewDTO:
       properties:
         command:
           type: string
@@ -347,7 +379,7 @@ components:
       type: object
       required:
         - command
-      title: CommandPreview
+      title: CommandPreviewDTO
     HTTPValidationError:
       properties:
         detail:
@@ -363,7 +395,7 @@ components:
         - RSA
         - ECDSA
       title: KeyType
-    LogEntry:
+    LogEntryDTO:
       properties:
         entryId:
           type: integer
@@ -384,7 +416,7 @@ components:
           title: Traceid
         commandInfo:
           anyOf:
-            - $ref: '#/components/schemas/CommandInfo'
+            - $ref: '#/components/schemas/CommandInfoDTO'
             - type: 'null'
       type: object
       required:
@@ -394,7 +426,7 @@ components:
         - message
         - traceId
         - commandInfo
-      title: LogEntry
+      title: LogEntryDTO
     LogSeverity:
       type: string
       enum:

@@ -15,7 +15,7 @@ class TestAPIServer(unittest.TestCase):
         self.cert_manager_mock = Mock(spec=CertificateManager)
         self.logger_mock = Mock(spec=Logger)
         self.api_server = APIServer(self.cert_manager_mock, self.logger_mock, "1.0.0", 8000)
-        self.client = TestClient(self.api_server._app)
+        self.client = TestClient(self.api_server.App)
 
     def test_list_certificates_preview(self):
         self.cert_manager_mock.preview_list_certificates.return_value = "step-ca list certificates"

@@ -19,6 +19,17 @@ from core.api_models import (
 from shared.logger import Logger, LogsFilter, Paging
 from shared.models import LogSeverity
 
+_default_response = {
+    500: {
+        "description": "Internal Server Error",
+        "content": {
+            "text/plain": {
+                "example": "An unexpected error occurred"
+            }
+        }
+    }
+}
+
 
 # noinspection PyPep8Naming
 class APIServer:
@@ -26,7 +37,7 @@ class APIServer:
         self._cert_manager = cert_manager
         self._logger = logger
         self._port = port
-        self._app = FastAPI(
+        self.App = FastAPI(
             title="Step-CA Management API",
             version=version,
             description="API for managing step-ca Certificate Authority",
@@ -42,10 +53,14 @@ class APIServer:
         self._setup_handlers()
 
     def run(self):
-        uvicorn.run(self._app, host="0.0.0.0", port=self._port)
+        uvicorn.run(self.App, host="0.0.0.0", port=self._port)
 
     def _setup_routes(self):
-        @self._app.get("/certificates", response_model=Union[List[CertificateDTO], CommandPreviewDTO])
+        @self.App.get(
+            "/certificates",
+            response_model=Union[List[CertificateDTO], CommandPreviewDTO],
+            responses=_default_response
+        )
         async def list_certificates(preview: bool = Query(...)) -> Union[List[CertificateDTO], CommandPreviewDTO]:
             if preview:
                 command = self._cert_manager.preview_list_certificates()
@@ -61,7 +76,11 @@ class APIServer:
                 ) for cert in certs
             ]
 
-        @self._app.post("/certificates/generate", response_model=Union[CertificateGenerateResult, CommandPreviewDTO])
+        @self.App.post(
+            "/certificates/generate",
+            response_model=Union[CertificateGenerateResult, CommandPreviewDTO],
+            responses=_default_response
+        )
         async def generate_certificate(
                 cert_request: CertificateGenerateRequest,
                 preview: bool = Query(...)
@@ -88,7 +107,11 @@ class APIServer:
                 expirationDate=cert.expiration_date
             )
 
-        @self._app.post("/certificates/renew", response_model=Union[CertificateRenewResult, CommandPreviewDTO])
+        @self.App.post(
+            "/certificates/renew",
+            response_model=Union[CertificateRenewResult, CommandPreviewDTO],
+            responses=_default_response
+        )
         async def renew_certificate(
                 certId: str = Query(...),
                 duration: int = Query(..., description="Duration in seconds"),
@@ -107,7 +130,11 @@ class APIServer:
                 newExpirationDate=cert.new_expiration_date
             )
 
-        @self._app.post("/certificates/revoke", response_model=Union[CertificateRevokeResult, CommandPreviewDTO])
+        @self.App.post(
+            "/certificates/revoke",
+            response_model=Union[CertificateRevokeResult, CommandPreviewDTO],
+            responses=_default_response
+        )
         async def revoke_certificate(
                 certId: str = Query(...),
                 preview: bool = Query(...)
@@ -125,7 +152,7 @@ class APIServer:
                 revocationDate=cert.revocation_date
             )
 
-        @self._app.get("/logs/single", response_model=LogEntryDTO)
+        @self.App.get("/logs/single", response_model=LogEntryDTO, responses=_default_response)
         async def get_log_entry(logId: int = Query(..., gt=0)):
             log_entry = self._logger.get_log_entry(logId)
             if not log_entry:
@@ -145,7 +172,7 @@ class APIServer:
                 ) if log_entry.command_info else None
             )
 
-        @self._app.post("/logs", response_model=List[LogEntryDTO])
+        @self.App.post("/logs", response_model=List[LogEntryDTO], responses=_default_response)
         async def get_logs(logs_request: LogsRequest) -> List[LogEntryDTO]:
             logs = self._logger.get_logs(
                 LogsFilter(
@@ -173,17 +200,17 @@ class APIServer:
             ]
 
     def _setup_handlers(self):
-        @self._app.exception_handler(HTTPException)
+        @self.App.exception_handler(HTTPException)
         async def custom_http_exception_handler(request: Request, exc: HTTPException):
             return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
 
-        @self._app.exception_handler(Exception)
+        @self.App.exception_handler(Exception)
         async def handle_all_exceptions(request: Request, exc: Exception):
             trace_id = getattr(request.state, 'trace_id', 'UNKNOWN')
             self._logger.log(LogSeverity.ERROR, f"Unhandled exception, trace_id [{trace_id}]: {exc}")
             return PlainTextResponse(f"Internal server error, trace_id [{trace_id}]", status_code=500)
 
-        @self._app.middleware("http")
+        @self.App.middleware("http")
         async def setup_logging_scope(request: Request, call_next):
             async with TraceIdHandler.logging_scope():
                 response = await call_next(request)

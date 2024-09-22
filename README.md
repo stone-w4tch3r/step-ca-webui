@@ -74,34 +74,7 @@ See [docs/ui-mockups.md](docs/ui-mockups.md) for ASCII mockups of the UI.
 
 ### Logging
 Convenient logging allows system to be transparent about underlying CLI wrapping. 
-This is important due to unstable nature of CLI tools. 
-
-Log entry structure:
-```python
-class LogSeverity(Enum):
-    DEBUG = "DEBUG"
-    INFO = "INFO"
-    WARN = "WARN"
-    ERROR = "ERROR"
-
-
-@dataclass
-class CommandInfo:
-    command: str
-    output: str
-    exit_code: int
-    action: str
-
-
-@dataclass
-class LogEntry:
-    entry_id: int
-    timestamp: datetime
-    severity: LogSeverity
-    message: str
-    trace_id: UUID
-    command_info: CommandInfo | None # for entries with command execution
-```
+This is important due to unstable nature of CLI tools.
 
 - Logs are stored in file (in future can be stored in database)
 - Escaping for JSON serialization
@@ -170,5 +143,4 @@ project_root/
 
 # TODO
 - [ ] Adjust class diagram after finalizing the project
-- [ ] Prevent simultaneous actions calls 
-- [ ] Add 'default' error values to the API spec (plaintext response)
+- [ ] Prevent simultaneous actions calls
