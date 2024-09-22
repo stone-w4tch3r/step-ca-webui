@@ -158,7 +158,7 @@ class APIServer:
         @self._app.exception_handler(Exception)
         async def handle_all_exceptions(request: Request, exc: Exception):
             trace_id = getattr(request.state, 'trace_id', 'UNKNOWN')
-            self._logger.log_scoped(LogSeverity.ERROR, f"Unhandled exception, trace_id [{trace_id}]: {exc}")
+            self._logger.log(LogSeverity.ERROR, f"Unhandled exception, trace_id [{trace_id}]: {exc}")
             return PlainTextResponse(f"Internal server error, trace_id [{trace_id}]", status_code=500)
 
         @self._app.middleware("http")

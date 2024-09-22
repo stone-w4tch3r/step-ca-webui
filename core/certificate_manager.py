@@ -56,10 +56,10 @@ class CertificateManager:
         success = exit_code == 0
         message = "Certificate generated successfully" if success else "Failed to generate certificate"
 
-        entry_id = self._logger.log_scoped(
+        entry_id = self._logger.log(
             LogSeverity.INFO if success else LogSeverity.ERROR,
             message,
-            CommandInfo(command, output, exit_code, "GENERATE_CERT")
+            CommandInfo(coommand=command, output=output, exit_code=exit_code, action="GENERATE_CERT")
         )
 
         return CertificateResult(
@@ -83,10 +83,10 @@ class CertificateManager:
         success = exit_code == 0
         message = "Certificate renewed successfully" if success else "Failed to renew certificate"
 
-        entry_id = self._logger.log_scoped(
+        entry_id = self._logger.log(
             LogSeverity.INFO if success else LogSeverity.ERROR,
             message,
-            CommandInfo(command, output, exit_code, "RENEW_CERT")
+            CommandInfo(comand=command, output=output, exit_code=exit_code, action="RENEW_CERT")
         )
 
         return CertificateResult(
@@ -109,10 +109,10 @@ class CertificateManager:
         success = exit_code == 0
         message = "Certificate revoked successfully" if success else "Failed to revoke certificate"
 
-        entry_id = self._logger.log_scoped(
+        entry_id = self._logger.log(
             LogSeverity.INFO if success else LogSeverity.ERROR,
             message,
-            CommandInfo(command, output, exit_code, "REVOKE_CERT")
+            CommandInfo(command=command, output=output, exit_code=exit_code, action="REVOKE_CERT")
         )
 
         return CertificateResult(
