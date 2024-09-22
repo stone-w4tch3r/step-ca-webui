@@ -6,7 +6,7 @@ from fastapi.responses import PlainTextResponse
 
 from core.certificate_manager import CertificateManager
 from core.trace_id_handler import TraceIdHandler
-from shared.api_models import (
+from core.api_models import (
     CertificateDTO,
     CertificateGenerateRequest,
     CertificateGenerateResult,
@@ -14,7 +14,7 @@ from shared.api_models import (
     CertificateRevokeResult,
     CommandPreviewDTO,
     LogEntryDTO,
-    LogsRequest
+    LogsRequest, CommandInfoDTO
 )
 from shared.logger import Logger, LogsFilter, Paging
 from shared.models import LogSeverity
@@ -63,13 +63,21 @@ class APIServer:
 
         @self._app.post("/certificates/generate", response_model=Union[CertificateGenerateResult, CommandPreviewDTO])
         async def generate_certificate(
-            cert_request: CertificateGenerateRequest,
-            preview: bool = Query(...)
+                cert_request: CertificateGenerateRequest,
+                preview: bool = Query(...)
         ):
             if preview:
-                command = self._cert_manager.preview_generate_certificate(cert_request.keyName, cert_request.keyType, cert_request.duration)
+                command = self._cert_manager.preview_generate_certificate(
+                    cert_request.keyName,
+                    cert_request.keyType,
+                    cert_request.duration
+                )
                 return CommandPreviewDTO(command=command)
-            cert = self._cert_manager.generate_certificate(cert_request.keyName, cert_request.keyType, cert_request.duration)
+            cert = self._cert_manager.generate_certificate(
+                cert_request.keyName,
+                cert_request.keyType,
+                cert_request.duration
+            )
 
             return CertificateGenerateResult(
                 success=cert.success,
@@ -82,9 +90,9 @@ class APIServer:
 
         @self._app.post("/certificates/renew", response_model=Union[CertificateRenewResult, CommandPreviewDTO])
         async def renew_certificate(
-            certId: str = Query(...),
-            duration: int = Query(..., description="Duration in seconds"),
-            preview: bool = Query(...)
+                certId: str = Query(...),
+                duration: int = Query(..., description="Duration in seconds"),
+                preview: bool = Query(...)
         ):
             if preview:
                 command = self._cert_manager.preview_renew_certificate(certId, duration)
@@ -101,8 +109,8 @@ class APIServer:
 
         @self._app.post("/certificates/revoke", response_model=Union[CertificateRevokeResult, CommandPreviewDTO])
         async def revoke_certificate(
-            certId: str = Query(...),
-            preview: bool = Query(...)
+                certId: str = Query(...),
+                preview: bool = Query(...)
         ):
             if preview:
                 command = self._cert_manager.preview_revoke_certificate(certId)
@@ -129,13 +137,22 @@ class APIServer:
                 severity=log_entry.severity,
                 message=log_entry.message,
                 traceId=log_entry.trace_id,
-                commandInfo=log_entry.command_info
+                commandInfo=CommandInfoDTO(
+                    command=log_entry.command_info.command,
+                    output=log_entry.command_info.output,
+                    exitCode=log_entry.command_info.exit_code,
+                    action=log_entry.command_info.action
+                ) if log_entry.command_info else None
             )
 
         @self._app.post("/logs", response_model=List[LogEntryDTO])
         async def get_logs(logs_request: LogsRequest) -> List[LogEntryDTO]:
             logs = self._logger.get_logs(
-                LogsFilter(trace_id=logs_request.traceId, commands_only=logs_request.commandsOnly, severity=logs_request.severity),
+                LogsFilter(
+                    trace_id=logs_request.traceId,
+                    commands_only=logs_request.commandsOnly,
+                    severity=logs_request.severity
+                ),
                 Paging(page=logs_request.page, page_size=logs_request.pageSize)
             )
 
@@ -146,7 +163,12 @@ class APIServer:
                     severity=log.severity,
                     message=log.message,
                     traceId=log.trace_id,
-                    commandInfo=log.command_info
+                    commandInfo=CommandInfoDTO(
+                        command=log.command_info.command,
+                        output=log.command_info.output,
+                        exitCode=log.command_info.exit_code,
+                        action=log.command_info.action
+                    ) if log.command_info else None
                 ) for log in logs
             ]
 

@@ -5,7 +5,7 @@ from logging.handlers import RotatingFileHandler
 from typing import List, Optional, Callable, Protocol
 from uuid import UUID
 
-from .models import LogEntry, LogSeverity, CommandInfo, LogsFilter, Paging
+from shared.models import LogEntry, LogSeverity, CommandInfo, LogsFilter, Paging
 
 
 class TraceIdProvider:

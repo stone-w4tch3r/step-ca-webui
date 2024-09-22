@@ -9,6 +9,7 @@ from core.certificate_manager import CertificateManager, Certificate, Certificat
 from shared.logger import Logger
 from shared.models import KeyType, LogSeverity, CommandInfo
 
+
 class TestAPIServer(unittest.TestCase):
     def setUp(self):
         self.cert_manager_mock = Mock(spec=CertificateManager)
@@ -35,14 +36,17 @@ class TestAPIServer(unittest.TestCase):
         self.assertEqual(response.json()[1]["id"], "cert2")
 
     def test_generate_certificate_preview(self):
-        self.cert_manager_mock.preview_generate_certificate.return_value = "step-ca certificate test test.crt test.key --key-type rsa --not-after 3600"
+        self.cert_manager_mock.preview_generate_certificate.return_value = \
+            "step-ca certificate test test.crt test.key --key-type rsa --not-after 3600"
         response = self.client.post("/certificates/generate?preview=true", json={
             "keyName": "test",
             "keyType": "RSA",
             "duration": 3600
         })
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {"command": "step-ca certificate test test.crt test.key --key-type rsa --not-after 3600"})
+        self.assertEqual(response.json(), {
+            "command": "step-ca certificate test test.crt test.key --key-type rsa --not-after 3600"
+        })
 
     def test_generate_certificate(self):
         mock_result = CertificateResult(
@@ -122,7 +126,7 @@ class TestAPIServer(unittest.TestCase):
         self.logger_mock.get_log_entry.return_value = None
         response = self.client.get("/logs/single?logId=999")
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.json()["detail"], "Log entry not found")
+        self.assertEqual(response.content, b"Log entry not found")
 
     def test_get_logs(self):
         mock_log_entries = [
@@ -147,7 +151,7 @@ class TestAPIServer(unittest.TestCase):
         response = self.client.post("/logs", json={
             "traceId": None,
             "commandsOnly": False,
-            "severity": None,
+            "severity": [],
             "page": 1,
             "pageSize": 10
         })
@@ -155,6 +159,7 @@ class TestAPIServer(unittest.TestCase):
         self.assertEqual(len(response.json()), 2)
         self.assertEqual(response.json()[0]["entryId"], 1)
         self.assertEqual(response.json()[1]["entryId"], 2)
+
 
 if __name__ == '__main__':
     unittest.main()

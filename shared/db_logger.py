@@ -40,7 +40,9 @@ class DBLogger(IDBLogger):
         if is_test:
             return
 
-        url = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+        url = ("postgresql://" +
+               f"{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}" +
+               f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}")
         self.engine = create_engine(url)
         self.Session = sessionmaker(bind=self.engine)
         _Base.metadata.create_all(self.engine)
