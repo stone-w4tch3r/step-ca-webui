@@ -1,11 +1,10 @@
 import unittest
 import uuid
-import asyncio
 from unittest.mock import patch
 from core.trace_id_handler import TraceIdHandler
 
 
-class TestTraceIdHandler(unittest.TestCase):
+class TestTraceIdHandler(unittest.IsolatedAsyncioTestCase):
 
     async def test_logging_scope(self):
         async with TraceIdHandler.logging_scope():
@@ -24,9 +23,9 @@ class TestTraceIdHandler(unittest.TestCase):
             self.assertEqual(TraceIdHandler.get_current_trace_id(), mock_uuid)
             self.assertEqual(TraceIdHandler.get_current_trace_id(), mock_uuid)  # Should return the same UUID
 
-    def test_get_current_trace_id_outside_scope(self):
+    async def test_get_current_trace_id_outside_scope(self):
         self.assertIsNone(TraceIdHandler.get_current_trace_id())
 
 
 if __name__ == '__main__':
-    asyncio.run(unittest.main())
+    unittest.main()
