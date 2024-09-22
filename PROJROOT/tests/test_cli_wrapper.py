@@ -1,4 +1,5 @@
 import unittest
+import subprocess
 from unittest.mock import patch
 from shared.cli_wrapper import CLIWrapper
 
