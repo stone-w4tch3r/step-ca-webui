@@ -35,7 +35,6 @@ body {
     }
 }
 
-
 .nav-button {
     background-color: #aa0000;
     color: white;
@@ -70,13 +69,17 @@ body {
     margin-top: 0;
 }
 
-.certs-table {
+.certs-table-container {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
     flex: 1;
     overflow-y: auto;
     padding: 10px;
+}
+
+.certs-table {
+    width: 100%;
 }
 
 th, td {
@@ -104,13 +107,13 @@ th {
 }
 
 @media screen and (min-width: 451px) and (max-width: 600px) {
-    .actions-container-td:has(button:nth-child(3)) {
+    .actions-container-td {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .actions-container-td button {
-        width: 70%; 
+        width: 70%;
     }
 }
 
