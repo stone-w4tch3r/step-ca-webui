@@ -9,16 +9,16 @@
 </head>
 <body>
 <div class="topbar">
-    <div class="logo">SSH Cert Manager</div>
-    <div class="nav-buttons-container">
-        <button class="nav-button">Dashboard</button>
-        <button class="nav-button">Logs</button>
-        <button class="nav-button">Menu</button>
+    <div class="topbar-logo">SSH Cert Manager</div>
+    <div class="topbar-nav-container">
+        <button class="topbar-nav-button">Dashboard</button>
+        <button class="topbar-nav-button">Logs</button>
+        <button class="topbar-nav-button">Menu</button>
     </div>
 </div>
 <div class="main-container">
-    <h1 class="main-container-header">Certificate Management</h1>
-    <div class="certs-table-container">
+    <h1 class="main-header">Certificate Management</h1>
+    <div class="main-container-content">
         <table class="certs-table">
             <thead class="certs-table-header">
             <tr>
@@ -31,65 +31,65 @@
             <tr>
                 <td>Cert 1</td>
                 <td>Active</td>
-                <td class="actions-container-td">
-                    <button class="action-button">Renew</button>
-                    <button class="action-button">Revoke</button>
-                    <button class="action-button">View</button>
-                    <button class="action-button">Do smth else</button>
+                <td class="certs-actions-td">
+                    <button class="small-button">Renew</button>
+                    <button class="small-button">Revoke</button>
+                    <button class="small-button">View</button>
+                    <button class="small-button">Do smth else</button>
                 </td>
             </tr>
             <tr>
                 <td>Cert 2</td>
                 <td>Expired</td>
-                <td class="actions-container-td">
-                    <button class="action-button">Delete</button>
-                    <button class="action-button">Delete</button>
+                <td class="certs-actions-td">
+                    <button class="small-button">Delete</button>
+                    <button class="small-button">Delete</button>
                 </td>
             </tr>
             <tr>
                 <td>Cert 3</td>
                 <td>Test</td>
-                <td class="actions-container-td">
-                    <button class="action-button">Delete</button>
-                    <button class="action-button">Yes</button>
-                    <button class="action-button">No no no</button>
+                <td class="certs-actions-td">
+                    <button class="small-button">Delete</button>
+                    <button class="small-button">Yes</button>
+                    <button class="small-button">No no no</button>
                 </td>
             </tr>
             <tr>
                 <td>Cert 5</td>
                 <td>Test</td>
-                <td class="actions-container-td">
-                    <button class="action-button">Delete</button>
+                <td class="certs-actions-td">
+                    <button class="small-button">Delete</button>
                 </td>
             </tr>
             <tr>
                 <td>Cert 4</td>
                 <td>Test</td>
-                <td class="actions-container-td">
-                    <button class="action-button">Delete</button>
-                    <button class="action-button">I</button>
-                    <button class="action-button">Love</button>
-                    <button class="action-button">You</button>
+                <td class="certs-actions-td">
+                    <button class="small-button">Delete</button>
+                    <button class="small-button">I</button>
+                    <button class="small-button">Love</button>
+                    <button class="small-button">You</button>
                 </td>
             </tr>
             <tr>
                 <td>Cert 6</td>
                 <td>Test</td>
-                <td class="actions-container-td">
-                    <button class="action-button">Delete</button>
+                <td class="certs-actions-td">
+                    <button class="small-button">Delete</button>
                 </td>
             </tr>
             <tr>
                 <td>Cert 7</td>
                 <td>Test</td>
-                <td class="actions-container-td">
-                    <button class="action-button">Delete</button>
+                <td class="certs-actions-td">
+                    <button class="small-button">Delete</button>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
-    <button id="generateCertBtn" class="generate-button">Generate New Certificate</button>
+    <button id="generateCertBtn" class="main-bottom-button">Generate New Certificate</button>
 </div>
 
 <!-- Modal -->
@@ -110,6 +110,7 @@
 
             <label for="duration">Duration:</label>
             <input type="number" id="duration" name="duration" required>
+            <!--suppress HtmlFormInputWithoutLabel -->
             <select id="durationUnit" name="durationUnit">
                 <option value="minutes">minutes</option>
                 <option value="hours">hours</option>

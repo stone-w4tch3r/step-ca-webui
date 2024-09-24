@@ -1,4 +1,3 @@
-<!-- logs.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,86 +8,98 @@
 </head>
 <body>
 <div class="topbar">
-    <div class="logo">SSH Cert Manager</div>
+    <div class="topbar-logo">SSH Cert Manager</div>
     <div>
-        <button class="nav-button">Dashboard</button>
-        <button class="nav-button">Logs</button>
-        <button class="nav-button">Menu</button>
+        <button class="topbar-nav-button">Dashboard</button>
+        <button class="topbar-nav-button">Logs</button>
+        <button class="topbar-nav-button">Menu</button>
     </div>
 </div>
 <div class="main-container">
-    <h1>Logs and Command History</h1>
-    <div class="filters">
-        <label>Severity:
-            <select>
-                <option>All</option>
-                <option>INFO</option>
-                <option>WARN</option>
-                <option>DEBUG</option>
-                <option>ERROR</option>
-            </select>
-        </label>
-        <label>Type:
-            <select>
-                <option>All</option>
-            </select>
-        </label>
-        <label>Date Range:
-            <input type="date" placeholder="From">
-            <input type="date" placeholder="To">
-        </label>
-        <button class="filter-button">Apply</button>
+    <h1 class="main-header">Logs and Command History</h1>
+    <div class="main-container-content">
+        <div class="logs-filters-container">
+            <label class="logs-filters-item">Commands only:
+                <select>
+                    <option>No</option>
+                    <option>Yes</option>
+                </select>
+            </label>
+            <label class="logs-filters-item logs-filters-datepicker">Date Range:
+                <input type="date" placeholder="From">
+                <input type="date" placeholder="To">
+            </label>
+            <label class="logs-filters-item">Keywords:
+                <input type="text" placeholder="Search...">
+            </label>
+            <fieldset class="logs-filters-fieldset">
+                <legend class="logs-filters-legend">Severity:</legend>
+                <label>
+                    <input type="checkbox" value="INFO" checked>
+                    INFO
+                </label>
+                <label>
+                    <input type="checkbox" value="WARN" checked>
+                    WARN
+                </label>
+                <label>
+                    <input type="checkbox" value="DEBUG" checked>
+                    DEBUG
+                </label>
+                <label>
+                    <input type="checkbox" value="ERROR" checked>
+                    ERROR
+                </label>
+            </fieldset>
+        </div>
+        <button class="small-button">Apply</button>
+        <table>
+            <thead>
+            <tr>
+                <th>EntryID</th>
+                <th>Timestamp</th>
+                <th>Severity</th>
+                <th>TraceID</th>
+                <th>Message</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>00002</td>
+                <td>2023-08-17 10:15</td>
+                <td>INFO</td>
+                <td>abc123</td>
+                <td>
+                    Generating new cert<br>
+                    $ step ca certificate ...<br>
+                    <a href="#">Click to see command output...</a>
+                </td>
+            </tr>
+            <tr>
+                <td>00003</td>
+                <td>2023-08-17 10:14</td>
+                <td>WARN</td>
+                <td>def456</td>
+                <td>Cert not exists</td>
+            </tr>
+            <tr>
+                <td>00004</td>
+                <td>2023-08-17 10:13</td>
+                <td>DEBUG</td>
+                <td>def456</td>
+                <td>Request revoke</td>
+            </tr>
+            <tr>
+                <td>00005</td>
+                <td>2023-08-17 10:12</td>
+                <td>ERROR</td>
+                <td>ghi789</td>
+                <td>Permission denied</td>
+            </tr>
+            </tbody>
+        </table>
     </div>
-    <div class="filters">
-        <input type="text" placeholder="Search...">
-        <button class="filter-button">Search</button>
-    </div>
-    <table>
-        <thead>
-        <tr>
-            <th>EntryID</th>
-            <th>Timestamp</th>
-            <th>Severity</th>
-            <th>TraceID</th>
-            <th>Message</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>00002</td>
-            <td>2023-08-17 10:15</td>
-            <td>INFO</td>
-            <td>abc123</td>
-            <td>
-                Generating new cert<br>
-                $ step ca certificate ...<br>
-                <a href="#">Click to see command output...</a>
-            </td>
-        </tr>
-        <tr>
-            <td>00003</td>
-            <td>2023-08-17 10:14</td>
-            <td>WARN</td>
-            <td>def456</td>
-            <td>Cert not exists</td>
-        </tr>
-        <tr>
-            <td>00004</td>
-            <td>2023-08-17 10:13</td>
-            <td>DEBUG</td>
-            <td>def456</td>
-            <td>Request revoke</td>
-        </tr>
-        <tr>
-            <td>00005</td>
-            <td>2023-08-17 10:12</td>
-            <td>ERROR</td>
-            <td>ghi789</td>
-            <td>Permission denied</td>
-        </tr>
-        </tbody>
-    </table>
-    <button class="load-more">Load More</button>
+    <button class="main-bottom-button">Load More</button>
 </div>
 </body>
 </html>
