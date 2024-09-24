@@ -1,24 +1,23 @@
-// script.js
-document.addEventListener('DOMContentLoaded', (event) => {
-    const modal = document.getElementById("generateCertModal");
-    const btn = document.getElementById("generateCertBtn");
-    const span = document.getElementsByClassName("modal-close")[0];
-    const form = document.getElementById("generateCertForm");
+document.addEventListener('DOMContentLoaded', (_) => {
+    const generateCertModal = document.getElementById("generateCertModal");
+    const generateCertBtn = document.getElementById("generateCertBtn");
+    const modalClose = document.getElementsByClassName("modal-close")[0];
+    const generateCertForm = document.getElementById("generateCertForm");
     const reloadPreviewBtn = document.getElementById("reloadPreview");
     const commandPreview = document.getElementById("commandPreview");
     const logContent = document.getElementById("logContent");
 
-    btn.onclick = function() {
-        modal.style.display = "block";
+    generateCertBtn.onclick = function() {
+        generateCertModal.style.display = "block";
     }
 
-    span.onclick = function() {
-        modal.style.display = "none";
+    modalClose.onclick = function() {
+        generateCertModal.style.display = "none";
     }
 
     window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
+        if (event.target === generateCertModal) {
+            generateCertModal.style.display = "none";
         }
     }
 
@@ -28,18 +27,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const duration = document.getElementById("duration").value;
         const durationUnit = document.getElementById("durationUnit").value;
 
-        const command = `step-ca command --key-name "${keyName}" --key-type ${keyType} --duration ${duration}${durationUnit}`;
-        commandPreview.textContent = command;
+        commandPreview.textContent = `step-ca command --key-name "${keyName}" --key-type ${keyType} --duration ${duration}${durationUnit}`;
     }
 
     reloadPreviewBtn.onclick = updateCommandPreview;
 
-    form.onsubmit = function(e) {
+    generateCertForm.onsubmit = function(e) {
         e.preventDefault();
         updateCommandPreview();
         
-        // Here you would typically send an AJAX request to your Flask backend
-        // For now, we'll just simulate it with a timeout
         logContent.innerHTML = "Executing command...";
         setTimeout(() => {
             logContent.innerHTML += "<br>Certificate generated successfully!";
