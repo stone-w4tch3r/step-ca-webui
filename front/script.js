@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', (event) => {
     const modal = document.getElementById("generateCertModal");
     const btn = document.getElementById("generateCertBtn");
-    const span = document.getElementsByClassName("close")[0];
+    const span = document.getElementsByClassName("modal-close")[0];
     const form = document.getElementById("generateCertForm");
     const reloadPreviewBtn = document.getElementById("reloadPreview");
     const commandPreview = document.getElementById("commandPreview");

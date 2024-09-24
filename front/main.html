@@ -93,11 +93,11 @@
 </div>
 
 <!-- Modal -->
-<div id="generateCertModal" class="modal">
+<div id="generateCertModal" class="modal-layer-container">
     <div class="modal-content">
-        <span class="close">&times;</span>
+        <span class="modal-close">&times;</span>  <!-- ྾ -->
         <h2>Generate New Certificate</h2>
-        <form id="generateCertForm">
+        <form id="generateCertForm" class="modal-cert-form">
             <label for="keyName">Key Name:</label>
             <input type="text" id="keyName" name="keyName" required>
 
@@ -122,7 +122,7 @@
 
             <button type="submit" id="executeCommand">Execute!</button>
         </form>
-        <div class="logs">
+        <div class="logs">  <!-- TODO: use full log component-->
             <h3>Logs:</h3>
             <div id="logContent"></div>
         </div>

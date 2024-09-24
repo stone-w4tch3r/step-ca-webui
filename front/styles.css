@@ -1,4 +1,4 @@
-/* styles.css */
+/* Main */
 body, html {
     margin: 0;
     padding: 0;
@@ -46,21 +46,23 @@ body {
 
 .main-container {
     max-width: 1000px;
-    margin-block: 20px;
-    margin-inline: 20px;
+    width: calc(100% - 40px);  /* Ensures horizontal margins 20px */
+    margin-block: 20px;  /* Vertical margins */
     background-color: white;
     border: 2px solid #cc0000;
     padding: 20px;
     display: flex;
     flex-direction: column;
-    flex: 1;
-    overflow: hidden;
+    flex: 1;  /* Grow and take up available space in parent */
+    overflow: hidden; /* Clips not fitting content */
+    align-self: center;  /* Center horizontally */
+    box-sizing: border-box;  /* Include padding and border in element's total width and height */
 }
 
 @media screen and (max-width: 450px) {
     .main-container {
+        width: calc(100% - 10px);  /* Ensures horizontal margins 5px */
         margin-block: 5px;
-        margin-inline: 5px;
     }
 }
 
@@ -71,10 +73,9 @@ body {
 
 .certs-table-container {
     width: 100%;
-    border-collapse: collapse;
     margin-top: 20px;
-    flex: 1;
-    overflow-y: auto;
+    flex: 1;  /* Grow and take up available space in parent (main-container) */
+    overflow-y: auto;  /* Enable vertical scrolling if content not fits */
     padding: 10px;
 }
 
@@ -82,32 +83,20 @@ body {
     width: 100%;
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    background-color: #f2f2f2;
-}
-
 .actions-container-td {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
     gap: 5px;
 }
 
-@media screen and (max-width: 450px) {
-    .actions-container-td:has(button:nth-child(2)) {
+@media screen and (max-width: 450px) {  /* Stack buttons vertically */
+    .actions-container-td {
         flex-direction: column;
         align-items: stretch;
     }
 }
 
 @media screen and (min-width: 451px) and (max-width: 600px) {
-    .actions-container-td {
+    .actions-container-td {  /* Needs to be duplicated */
         flex-direction: column;
         align-items: center;
     }
@@ -137,6 +126,20 @@ th {
     width: 100%;
 }
 
+/* Tables */
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+/* Logs */
+
 .filters {
     margin-bottom: 20px;
 }
@@ -157,67 +160,66 @@ th {
     margin-top: 20px;
 }
 
-.modal {
-    display: none;
-    position: fixed;
+/* Modal */
+
+.modal-layer-container {  /* Lays 100% over the whole page */
+    display: none;  /* Initially hidden */
+    position: fixed;  /* Stay in place relive to the browser window */
     z-index: 1;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
+    overflow: auto;  /* Scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4);  /* slightly shaded background */
 }
 
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto;
+    margin-inline: auto;  /* Horizontally */
+    margin-block: 15%;  /* Vertically */
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
     max-width: 600px;
 }
 
-.close {
+.modal-close {
     color: #aaa;
-    float: right;
+    float: right;  /* Positioned at the right relative to the modal-content */
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
 }
 
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
+.modal-cert-form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-.modal input, .modal select {
-    width: 100%;
+.modal-layer-container input, .modal-layer-container select {
     padding: 5px;
-    margin: 5px 0;
 }
 
-.modal button {
+.modal-layer-container button {
     background-color: #cc0000;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding-inline: 20px;  /* Horizontal */ 
+    padding-block: 10px;  /* Vertical */
     cursor: pointer;
-    margin-top: 10px;
 }
 
-.modal pre {
+.modal-layer-container pre {
     background-color: #f0f0f0;
     padding: 10px;
-    overflow-x: auto;
+    overflow-x: auto;  /* Horizontal scrolling if needed */
 }
 
-.modal .logs {
+.modal-layer-container .logs {
     background-color: #f0f0f0;
     padding: 10px;
-    margin-top: 10px;
-    height: 100px;
+    min-height: 200px;
     overflow-y: auto;
 }
