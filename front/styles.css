@@ -1,3 +1,10 @@
+/* CSS Reset */
+*, *::before, *::after {
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    margin: 0;
+    padding: 0;
+}
+
 /*:root {*/
 [data-theme='dark'] {
     --color-red: #cc0000;
@@ -6,6 +13,7 @@
     --color-bg-textfield: #f2f2f2;
     --color-border: #ddd;
     --color-shadow: #aaa;
+    --color-focus: #930d17;
     --color-text-contrast: white;
     --color-text-main: black;
     --color-table-header: #f2f2f2;
@@ -20,6 +28,7 @@
     --color-bg-textfield: #1a1a1a;
     --color-border: #757575;
     --color-shadow: #777;
+    --color-focus: #ffa6a6;
     --color-text-contrast: white;
     --color-text-main: white;
     --color-table-header: #444444;
@@ -34,7 +43,9 @@ body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     background-color: var(--color-bg);
     color: var(--color-text-main);
 }
@@ -92,7 +103,6 @@ body {
     flex: 1; /* Grow and take up available space in parent */
     overflow: hidden; /* Clips not fitting content */
     align-self: center; /* Center horizontally */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
 }
 
 @media screen and (max-width: 450px) {
@@ -167,6 +177,15 @@ a:visited {
     color: var(--color-a-visited);
 }
 
+h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+    margin-bottom: 0.5em;
+}
+
+p {
+    margin-bottom: 1em;
+}
+
 /* Certs */
 
 .certs-actions-td {
@@ -201,7 +220,6 @@ a:visited {
     flex-wrap: wrap;
     gap: 10px;
     width: 80%;
-    box-sizing: border-box;
 }
 
 .logs-filters-item {
@@ -282,6 +300,8 @@ a:visited {
     padding: 10px;
     border: 1px solid var(--color-border);
     overflow-x: auto; /* Horizontal scrolling if needed */
+    font-size: 14px;
+
 }
 
 .modal-logs {
@@ -290,6 +310,8 @@ a:visited {
     padding: 10px;
     min-height: 200px;
     overflow-y: auto;
+    font-family: monospace;
+    font-size: 14px;
 }
 
 .modal-logs h3 {
