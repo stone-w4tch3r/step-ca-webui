@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', (_) => {
         const duration = document.getElementById("duration").value;
         const durationUnit = document.getElementById("durationUnit").value;
 
+        commandPreview.style.display = "block";
         commandPreview.textContent = `step-ca command --key-name "${keyName}" --key-type ${keyType} --duration ${duration}${durationUnit}`;
     }
 

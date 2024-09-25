@@ -1,9 +1,38 @@
+/*:root {*/
+[data-theme='dark'] {
+    --color-red: #cc0000;
+    --color-bg: white;
+    --color-bg-overlay: rgba(0, 0, 0, 0.4);
+    --color-bg-textfield: #f2f2f2;
+    --color-border: #ddd;
+    --color-shadow: #aaa;
+    --color-text-contrast: white;
+    --color-text-main: black;
+    --color-table-header: #f2f2f2;
+    --modal-bg: #fefefe;
+}
+
+/*[data-theme='dark'] {*/
+:root {
+    --color-red: #ff4444;
+    --color-bg: #2f2f2f;
+    --color-bg-overlay: rgba(255, 255, 255, 0.1);
+    --color-bg-textfield: #1a1a1a;
+    --color-border: #757575;
+    --color-shadow: #777;
+    --color-text-contrast: white;
+    --color-text-main: white;
+    --color-table-header: #444444;
+    --modal-bg: #3e3e3e;
+}
+
 body, html {
     margin: 0;
     padding: 0;
     height: 100%;
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background-color: var(--color-bg);
+    color: var(--color-text-main);
 }
 
 body {
@@ -14,8 +43,8 @@ body {
 /* Topbar */
 
 .topbar {
-    background-color: #cc0000;
-    color: white;
+    background-color: var(--color-red);
+    color: var(--color-text-contrast);
     padding: 10px;
     display: flex;
     justify-content: space-between;
@@ -37,8 +66,8 @@ body {
 }
 
 .topbar-nav-button {
-    background-color: #aa0000;
-    color: white;
+    background-color: var(--color-red);
+    color: var(--color-text-contrast);
     border: none;
     padding: 5px 10px;
     margin-left: 10px;
@@ -51,8 +80,8 @@ body {
     max-width: 1000px;
     width: calc(100% - 40px); /* Ensures horizontal margins 20px */
     margin-block: 20px; /* Vertical margins */
-    background-color: white;
-    border: 2px solid #cc0000;
+    background-color: var(--color-bg);
+    border: 2px solid var(--color-red);
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -70,7 +99,7 @@ body {
 }
 
 .main-header {
-    color: #cc0000;
+    color: var(--color-red);
     margin-top: 0;
 }
 
@@ -86,8 +115,8 @@ body {
 }
 
 .main-bottom-button {
-    background-color: #cc0000;
-    color: white;
+    background-color: var(--color-red);
+    color: var(--color-text-contrast);
     border: none;
     padding: 10px 20px;
     font-size: 16px;
@@ -96,20 +125,27 @@ body {
     width: 100%;
 }
 
-/* Table */
+/* Base tags */
 
 th, td {
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
     padding: 8px;
     text-align: left;
 }
 
 th {
-    background-color: #f2f2f2;
+    background-color: var(--color-table-header);
 }
 
 table {
     width: 100%;
+}
+
+input {
+    background-color: var(--color-bg-textfield);
+    border: 1px solid var(--color-border);
+    padding: 5px;
+    color: var(--color-text-main);
 }
 
 /* Certs */
@@ -168,12 +204,12 @@ table {
 .logs-filters-legend {
     position: absolute;
     left: -40px;
-    background-color: white;
+    background-color: var(--color-bg);
 }
 
 /* Modal */
 
-.modal-layer-container { /* Lays 100% over the whole page */
+.modal { /* Lays 100% over the whole page */
     display: none; /* Initially hidden */
     position: fixed; /* Stay in place relive to the browser window */
     z-index: 1;
@@ -182,21 +218,24 @@ table {
     width: 100%;
     height: 100%;
     overflow: auto; /* Scroll if needed */
-    background-color: rgba(0, 0, 0, 0.4); /* slightly shaded background */
+    background-color: var(--color-bg-overlay); /* slightly shaded background */
 }
 
 .modal-content {
-    background-color: #fefefe;
+    background-color: var(--modal-bg);
     margin-inline: auto; /* Horizontally */
     margin-block: 15%; /* Vertically */
     padding: 20px;
-    border: 1px solid #888;
+    border: 1px solid var(--color-border);
     width: 80%;
     max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .modal-close {
-    color: #aaa;
+    color: var(--color-shadow);
     float: right; /* Positioned at the right relative to the modal-content */
     font-size: 28px;
     font-weight: bold;
@@ -209,37 +248,47 @@ table {
     gap: 5px;
 }
 
-.modal-layer-container input, .modal-layer-container select {
-    padding: 5px;
-}
-
-.modal-layer-container button {
-    background-color: #cc0000;
-    color: white;
+.modal button {
+    background-color: var(--color-red);
+    color: var(--color-text-contrast);
     border: none;
     padding-inline: 20px; /* Horizontal */
     padding-block: 10px; /* Vertical */
     cursor: pointer;
 }
 
-.modal-layer-container pre {
-    background-color: #f0f0f0;
+.modal pre {
+    display: none;
+    background-color: var(--color-bg-textfield);
     padding: 10px;
+    border: 1px solid var(--color-border);
     overflow-x: auto; /* Horizontal scrolling if needed */
 }
 
-.modal-layer-container .logs {
-    background-color: #f0f0f0;
+.modal select {
+    padding: 5px;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-main);
+}
+
+.modal-logs {
+    background-color: var(--color-bg-textfield);
+    border: 1px solid var(--color-border);
     padding: 10px;
     min-height: 200px;
     overflow-y: auto;
 }
 
+.modal-logs h3 {
+    margin-top: 0;
+}
+
 /* Generic */
 
 .small-button {
-    background-color: #cc0000;
-    color: white;
+    background-color: var(--color-red);
+    color: var(--color-text-contrast);
     border: none;
     padding: 5px 10px;
     margin-right: 5px;

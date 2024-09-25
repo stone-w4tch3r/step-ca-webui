@@ -93,7 +93,7 @@
 </div>
 
 <!-- Modal -->
-<div id="generateCertModal" class="modal-layer-container">
+<div id="generateCertModal" class="modal">
     <div class="modal-content">
         <span class="modal-close">&times;</span>  <!-- ྾ -->
         <h2>Generate New Certificate</h2>
@@ -109,7 +109,7 @@
             </select>
 
             <label for="duration">Duration:</label>
-            <input type="number" id="duration" name="duration" required>
+            <input type="text" id="duration" name="duration" required>
             <!--suppress HtmlFormInputWithoutLabel -->
             <select id="durationUnit" name="durationUnit">
                 <option value="minutes">minutes</option>
@@ -123,7 +123,7 @@
 
             <button type="submit" id="executeCommand">Execute!</button>
         </form>
-        <div class="logs">  <!-- TODO: use full log component-->
+        <div class="modal-logs">  <!-- TODO: use full log component-->
             <h3>Logs:</h3>
             <div id="logContent"></div>
         </div>
