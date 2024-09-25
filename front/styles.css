@@ -24,6 +24,10 @@
     --color-text-main: white;
     --color-table-header: #444444;
     --modal-bg: #3e3e3e;
+
+    /* Shared */
+    --color-a-default: #137bfc;
+    --color-a-visited: #a44fff;
 }
 
 body, html {
@@ -148,6 +152,21 @@ input {
     color: var(--color-text-main);
 }
 
+select {
+    padding: 5px;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-main);
+}
+
+a {
+    color: var(--color-a-default);
+}
+
+a:visited {
+    color: var(--color-a-visited);
+}
+
 /* Certs */
 
 .certs-actions-td {
@@ -263,13 +282,6 @@ input {
     padding: 10px;
     border: 1px solid var(--color-border);
     overflow-x: auto; /* Horizontal scrolling if needed */
-}
-
-.modal select {
-    padding: 5px;
-    background-color: var(--color-bg);
-    border: 1px solid var(--color-border);
-    color: var(--color-text-main);
 }
 
 .modal-logs {
