@@ -12,3 +12,14 @@ class CertificateActionData(BaseModel):
 
 class DashboardTemplateData(BaseModel):
     Certificates: List[CertificateActionData]
+
+
+class LogData(BaseModel):
+    entry_id: str
+    timestamp: str
+    severity: str
+    trace_id: str
+
+
+class LogsTemplateData(BaseModel):
+    Logs: List[LogData]

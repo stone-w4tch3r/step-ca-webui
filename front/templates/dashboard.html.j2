@@ -5,80 +5,80 @@
 {% block header %}Certificate Management{% endblock %}
 
 {% block content %}
-        <table class="certs-table">
-            <thead class="certs-table-header">
-            <tr>
-                <th>Cert Name</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for cert in certificates %}
+    <table class="certs-table">
+        <thead class="certs-table-header">
+        <tr>
+            <th>Cert Name</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for cert in certificates %}
             <tr>
                 <td>{{ cert.name }}</td>
                 <td>{{ cert.status }}</td>
                 <td class="certs-actions-td">
                     {% for action in cert.actions %}
-                    <form method="POST" action="{{ url_for('perform_action') }}" style="display: inline;">
-                        <input type="hidden" name="cert_id" value="{{ cert.id }}">
-                        <input type="hidden" name="action" value="{{ action }}">
-                        <button type="submit" class="small-button">{{ action|capitalize }}</button>
-                    </form>
+                        <form method="POST" action="{{ url_for('perform_action') }}" style="display: inline;">
+                            <input type="hidden" name="cert_id" value="{{ cert.id }}">
+                            <input type="hidden" name="action" value="{{ action }}">
+                            <button type="submit" class="small-button">{{ action|capitalize }}</button>
+                        </form>
                     {% endfor %}
                 </td>
             </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
 
 {% block bottom_button %}
-{% block bottom_button %}
-    <button id="generateCertBtn" class="main-bottom-button">Generate New Certificate</button>
-{% endblock %}
+    {% block bottom_button %}
+        <button id="generateCertBtn" class="main-bottom-button">Generate New Certificate</button>
+    {% endblock %}
 {% endblock %}
 
 {% block extra_content %}
-<!-- Modal -->
-<div id="generateCertModal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close">&times;</span>  <!-- ྾ -->
-        <h2>Generate New Certificate</h2>
-        <form id="generateCertForm" class="modal-cert-form">
-            <label for="keyName">Key Name:</label>
-            <input type="text" id="keyName" name="keyName" required>
+    <!-- Modal -->
+    <div id="generateCertModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>  <!-- ྾ -->
+            <h2>Generate New Certificate</h2>
+            <form id="generateCertForm" class="modal-cert-form">
+                <label for="keyName">Key Name:</label>
+                <input type="text" id="keyName" name="keyName" required>
 
-            <label for="keyType">Key Type:</label>
-            <select id="keyType" name="keyType">
-                <option value="RSA">RSA</option>
-                <option value="ECDSA">ECDSA</option>
-                <option value="Ed25519">Ed25519</option>
-            </select>
+                <label for="keyType">Key Type:</label>
+                <select id="keyType" name="keyType">
+                    <option value="RSA">RSA</option>
+                    <option value="ECDSA">ECDSA</option>
+                    <option value="Ed25519">Ed25519</option>
+                </select>
 
-            <label for="duration">Duration:</label>
-            <input type="text" id="duration" name="duration" required>
-            <!--suppress HtmlFormInputWithoutLabel -->
-            <select id="durationUnit" name="durationUnit">
-                <option value="minutes">minutes</option>
-                <option value="hours">hours</option>
-                <option value="days">days</option>
-            </select>
+                <label for="duration">Duration:</label>
+                <input type="text" id="duration" name="duration" required>
+                <!--suppress HtmlFormInputWithoutLabel -->
+                <select id="durationUnit" name="durationUnit">
+                    <option value="minutes">minutes</option>
+                    <option value="hours">hours</option>
+                    <option value="days">days</option>
+                </select>
 
-            <h3>Command that will be executed:</h3>
-            <button type="button" id="reloadPreview">Click here to reload preview</button>
-            <pre id="commandPreview"></pre>
+                <h3>Command that will be executed:</h3>
+                <button type="button" id="reloadPreview">Click here to reload preview</button>
+                <pre id="commandPreview"></pre>
 
-            <button type="submit" id="executeCommand">Execute!</button>
-        </form>
-        <div class="modal-logs">  <!-- TODO: use full log component-->
-            <h3>Logs:</h3>
-            <div id="logContent"></div>
+                <button type="submit" id="executeCommand">Execute!</button>
+            </form>
+            <div class="modal-logs">  <!-- TODO: use full log component-->
+                <h3>Logs:</h3>
+                <div id="logContent"></div>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
-<script src="script.js"></script>
+    <script src="script.js"></script>
 {% endblock %}

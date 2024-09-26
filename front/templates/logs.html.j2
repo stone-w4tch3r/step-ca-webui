@@ -5,55 +5,65 @@
 {% block header %}Logs and Command History{% endblock %}
 
 {% block content %}
-        <div class="logs-filters-container">
-            <label class="logs-filters-item">Commands only:
-                <select name="commands_only">
-                    <option value="no" {% if filters.commands_only == 'no' %}selected{% endif %}>No</option>
-                    <option value="yes" {% if filters.commands_only == 'yes' %}selected{% endif %}>Yes</option>
-                </select>
+    <div class="logs-filters-container">
+        <label class="logs-filters-item">Commands only:
+            <select>
+                <option>No</option>
+                <option>Yes</option>
+            </select>
+        </label>
+        <label class="logs-filters-item logs-filters-datepicker">Date Range:
+            <input type="date" placeholder="From">
+            <input type="date" placeholder="To">
+        </label>
+        <label class="logs-filters-item">Keywords:
+            <input type="text" placeholder="Search...">
+        </label>
+        <fieldset class="logs-filters-fieldset">
+            <legend class="logs-filters-legend">Severity:</legend>
+            <label>
+                <input type="checkbox" value="INFO" checked>
+                INFO
             </label>
-            <label class="logs-filters-item logs-filters-datepicker">Date Range:
-                <input type="date" name="date_from" value="{{ filters.date_from }}" placeholder="From">
-                <input type="date" name="date_to" value="{{ filters.date_to }}" placeholder="To">
+            <label>
+                <input type="checkbox" value="WARN" checked>
+                WARN
             </label>
-            <label class="logs-filters-item">Keywords:
-                <input type="text" name="keywords" value="{{ filters.keywords }}" placeholder="Search...">
+            <label>
+                <input type="checkbox" value="DEBUG" checked>
+                DEBUG
             </label>
-            <fieldset class="logs-filters-fieldset">
-                <legend class="logs-filters-legend">Severity:</legend>
-                {% for severity in ['INFO', 'WARN', 'DEBUG', 'ERROR'] %}
-                <label>
-                    <input type="checkbox" name="severity" value="{{ severity }}" {% if severity in filters.severity %}checked{% endif %}>
-                    {{ severity }}
-                </label>
-                {% endfor %}
-            </fieldset>
-        </div>
-        <button class="small-button" type="submit">Apply</button>
-        <table>
-            <thead>
-            <tr>
-                <th>EntryID</th>
-                <th>Timestamp</th>
-                <th>Severity</th>
-                <th>TraceID</th>
-                <th>Message</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for log in logs %}
+            <label>
+                <input type="checkbox" value="ERROR" checked>
+                ERROR
+            </label>
+        </fieldset>
+    </div>
+    <button class="small-button" type="submit">Apply</button>
+    <table>
+        <thead>
+        <tr>
+            <th>EntryID</th>
+            <th>Timestamp</th>
+            <th>Severity</th>
+            <th>TraceID</th>
+            <th>Message</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for log in logs %}
             <tr>
                 <td>{{ log.entry_id }}</td>
                 <td>{{ log.timestamp }}</td>
                 <td>{{ log.severity }}</td>
                 <td>{{ log.trace_id }}</td>
                 <td>
-                    {{ log.message | safe }}
+                    {{ log.message | safe }}  {# Assuming message is HTML safe and does not need escaping #}
                 </td>
             </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
 
 {% block bottom_button %}
