@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SSH Certificate Management{% endblock %}</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav class="topbar">
+    <div class="topbar-logo">SSH Cert Manager</div>
+    <ul class="topbar-nav-container">
+        <li><a href="dashboard.html" class="topbar-nav-button">Dashboard</a></li>
+        <li><a href="logs.html" class="topbar-nav-button">Logs</a></li>
+        <li><a href="#" class="topbar-nav-button">Menu</a></li>
+    </ul>
+</nav>
+<div class="main-container">
+    <h1 class="main-header">{% block header %}{% endblock %}</h1>
+    <div class="main-container-content">
+        {% block content %}{% endblock %}
+    </div>
+    {% block bottom_button %}{% endblock %}
+</div>
+{% block extra_content %}{% endblock %}
+{% block scripts %}{% endblock %}
+</body>
+</html>

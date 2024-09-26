@@ -1,23 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSH Certificate Management - Logs</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-<div class="topbar">
-    <div class="topbar-logo">SSH Cert Manager</div>
-    <div>
-        <button class="topbar-nav-button">Dashboard</button>
-        <button class="topbar-nav-button">Logs</button>
-        <button class="topbar-nav-button">Menu</button>
-    </div>
-</div>
-<div class="main-container">
-    <h1 class="main-header">Logs and Command History</h1>
-    <div class="main-container-content">
+{% extends "base.html" %}
+
+{% block title %}SSH Certificate Management - Logs{% endblock %}
+
+{% block header %}Logs and Command History{% endblock %}
+
+{% block content %}
         <div class="logs-filters-container">
             <label class="logs-filters-item">Commands only:
                 <select>
@@ -99,7 +86,8 @@
             </tbody>
         </table>
     </div>
+{% endblock %}
+
+{% block bottom_button %}
     <button class="main-bottom-button">Load More</button>
-</div>
-</body>
-</html>
+{% endblock %}

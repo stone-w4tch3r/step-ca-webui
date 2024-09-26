@@ -1,24 +1,10 @@
-<!-- index.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSH Certificate Management - Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-<div class="topbar">
-    <div class="topbar-logo">SSH Cert Manager</div>
-    <div class="topbar-nav-container">
-        <button class="topbar-nav-button">Dashboard</button>
-        <button class="topbar-nav-button">Logs</button>
-        <button class="topbar-nav-button">Menu</button>
-    </div>
-</div>
-<div class="main-container">
-    <h1 class="main-header">Certificate Management</h1>
-    <div class="main-container-content">
+{% extends "base.html" %}
+
+{% block title %}SSH Certificate Management - Dashboard{% endblock %}
+
+{% block header %}Certificate Management{% endblock %}
+
+{% block content %}
         <table class="certs-table">
             <thead class="certs-table-header">
             <tr>
@@ -88,10 +74,13 @@
             </tr>
             </tbody>
         </table>
-    </div>
-    <button id="generateCertBtn" class="main-bottom-button">Generate New Certificate</button>
-</div>
+{% endblock %}
 
+{% block bottom_button %}
+<button id="generateCertBtn" class="main-bottom-button">Generate New Certificate</button>
+{% endblock %}
+
+{% block extra_content %}
 <!-- Modal -->
 <div id="generateCertModal" class="modal">
     <div class="modal-content">
@@ -128,8 +117,8 @@
             <div id="logContent"></div>
         </div>
     </div>
-</div>
+{% endblock %}
 
+{% block scripts %}
 <script src="script.js"></script>
-</body>
-</html>
+{% endblock %}
