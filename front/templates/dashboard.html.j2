@@ -34,9 +34,9 @@
 {% endblock %}
 
 {% block bottom_button %}
-<form method="GET" action="{{ url_for('generate_certificate') }}">
-    <button type="submit" id="generateCertBtn" class="main-bottom-button">Generate New Certificate</button>
-</form>
+{% block bottom_button %}
+    <button id="generateCertBtn" class="main-bottom-button">Generate New Certificate</button>
+{% endblock %}
 {% endblock %}
 
 {% block extra_content %}
