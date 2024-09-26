@@ -77,6 +77,7 @@ body {
         align-items: stretch;
         flex-direction: column;
         gap: 4px;
+        list-style-type: none;
     }
 }
 
@@ -87,6 +88,12 @@ body {
     padding: 5px 10px;
     margin-left: 10px;
     cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.topbar-nav-container li {
+    display: inline-block;
 }
 
 /* Main */
