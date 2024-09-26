@@ -5,41 +5,44 @@
 {% block header %}Logs and Command History{% endblock %}
 
 {% block content %}
-    <div class="logs-filters-container">
-        <label class="logs-filters-item">Commands only:
-            <select>
-                <option>No</option>
-                <option>Yes</option>
+    <form action="/logs" method="GET" class="logs-filters-container">
+        <div class="logs-filters-item">
+            <label for="commands_only">Commands only:</label>
+            <select name="commands_only" id="commands_only">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
             </select>
-        </label>
-        <label class="logs-filters-item logs-filters-datepicker">Date Range:
-            <input type="date" placeholder="From">
-            <input type="date" placeholder="To">
-        </label>
-        <label class="logs-filters-item">Keywords:
-            <input type="text" placeholder="Search...">
-        </label>
+        </div>
+        <div class="logs-filters-item logs-filters-datepicker">
+            <label>Date Range:</label>
+            <input type="date" name="date_from" placeholder="From">
+            <input type="date" name="date_to" placeholder="To">
+        </div>
+        <div class="logs-filters-item">
+            <label for="keywords">Keywords:</label>
+            <input type="text" name="keywords" id="keywords" placeholder="Search...">
+        </div>
         <fieldset class="logs-filters-fieldset">
             <legend class="logs-filters-legend">Severity:</legend>
             <label>
-                <input type="checkbox" value="INFO" checked>
+                <input type="checkbox" name="severity[]" value="INFO" checked>
                 INFO
             </label>
             <label>
-                <input type="checkbox" value="WARN" checked>
+                <input type="checkbox" name="severity[]" value="WARN" checked>
                 WARN
             </label>
             <label>
-                <input type="checkbox" value="DEBUG" checked>
+                <input type="checkbox" name="severity[]" value="DEBUG" checked>
                 DEBUG
             </label>
             <label>
-                <input type="checkbox" value="ERROR" checked>
+                <input type="checkbox" name="severity[]" value="ERROR" checked>
                 ERROR
             </label>
         </fieldset>
-    </div>
-    <button class="small-button" type="submit">Apply</button>
+        <button class="small-button" type="submit">Apply</button>
+    </form>
     <table>
         <thead>
         <tr>
@@ -58,7 +61,7 @@
                 <td>{{ log.severity }}</td>
                 <td>{{ log.trace_id }}</td>
                 <td>
-                    {{ log.message | safe }}  {# Assuming message is HTML safe and does not need escaping #}
+                    {{ log.message | safe }} {# Assuming message is HTML safe and does not need escaping #}
                 </td>
             </tr>
         {% endfor %}
