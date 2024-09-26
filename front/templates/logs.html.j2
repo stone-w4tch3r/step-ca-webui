@@ -7,39 +7,29 @@
 {% block content %}
         <div class="logs-filters-container">
             <label class="logs-filters-item">Commands only:
-                <select>
-                    <option>No</option>
-                    <option>Yes</option>
+                <select name="commands_only">
+                    <option value="no" {% if filters.commands_only == 'no' %}selected{% endif %}>No</option>
+                    <option value="yes" {% if filters.commands_only == 'yes' %}selected{% endif %}>Yes</option>
                 </select>
             </label>
             <label class="logs-filters-item logs-filters-datepicker">Date Range:
-                <input type="date" placeholder="From">
-                <input type="date" placeholder="To">
+                <input type="date" name="date_from" value="{{ filters.date_from }}" placeholder="From">
+                <input type="date" name="date_to" value="{{ filters.date_to }}" placeholder="To">
             </label>
             <label class="logs-filters-item">Keywords:
-                <input type="text" placeholder="Search...">
+                <input type="text" name="keywords" value="{{ filters.keywords }}" placeholder="Search...">
             </label>
             <fieldset class="logs-filters-fieldset">
                 <legend class="logs-filters-legend">Severity:</legend>
+                {% for severity in ['INFO', 'WARN', 'DEBUG', 'ERROR'] %}
                 <label>
-                    <input type="checkbox" value="INFO" checked>
-                    INFO
+                    <input type="checkbox" name="severity" value="{{ severity }}" {% if severity in filters.severity %}checked{% endif %}>
+                    {{ severity }}
                 </label>
-                <label>
-                    <input type="checkbox" value="WARN" checked>
-                    WARN
-                </label>
-                <label>
-                    <input type="checkbox" value="DEBUG" checked>
-                    DEBUG
-                </label>
-                <label>
-                    <input type="checkbox" value="ERROR" checked>
-                    ERROR
-                </label>
+                {% endfor %}
             </fieldset>
         </div>
-        <button class="small-button">Apply</button>
+        <button class="small-button" type="submit">Apply</button>
         <table>
             <thead>
             <tr>
@@ -51,41 +41,21 @@
             </tr>
             </thead>
             <tbody>
+            {% for log in logs %}
             <tr>
-                <td>00002</td>
-                <td>2023-08-17 10:15</td>
-                <td>INFO</td>
-                <td>abc123</td>
+                <td>{{ log.entry_id }}</td>
+                <td>{{ log.timestamp }}</td>
+                <td>{{ log.severity }}</td>
+                <td>{{ log.trace_id }}</td>
                 <td>
-                    Generating new cert<br>
-                    $ step ca certificate ...<br>
+                    {{ log.message | safe }}
                 </td>
             </tr>
-            <tr>
-                <td>00003</td>
-                <td>2023-08-17 10:14</td>
-                <td>WARN</td>
-                <td>def456</td>
-                <td>Cert not exists</td>
-            </tr>
-            <tr>
-                <td>00004</td>
-                <td>2023-08-17 10:13</td>
-                <td>DEBUG</td>
-                <td>def456</td>
-                <td>Request revoke</td>
-            </tr>
-            <tr>
-                <td>00005</td>
-                <td>2023-08-17 10:12</td>
-                <td>ERROR</td>
-                <td>ghi789</td>
-                <td>Permission denied</td>
-            </tr>
+            {% endfor %}
             </tbody>
         </table>
 {% endblock %}
 
 {% block bottom_button %}
-    <button class="main-bottom-button">Load More</button>
+    <button class="main-bottom-button" id="load-more">Load More</button>
 {% endblock %}
