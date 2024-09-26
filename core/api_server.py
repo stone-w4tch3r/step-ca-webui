@@ -6,7 +6,7 @@ from fastapi.responses import PlainTextResponse
 
 from core.certificate_manager import CertificateManager
 from core.trace_id_handler import TraceIdHandler
-from core.api_models import (
+from shared.api_models import (
     CertificateDTO,
     CertificateGenerateRequest,
     CertificateGenerateResult,
