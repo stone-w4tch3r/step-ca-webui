@@ -3,15 +3,11 @@ from typing import List
 from pydantic import BaseModel
 
 
-class CertificateActionData(BaseModel):
-    Id: str
-    Name: str
-    Status: str
-    Actions: List[str]
-
-
-class DashboardTemplateData(BaseModel):
-    Certificates: List[CertificateActionData]
+class CertificateData(BaseModel):
+    id: str
+    name: str
+    status: str
+    actions: List[str]
 
 
 class LogData(BaseModel):
@@ -19,7 +15,3 @@ class LogData(BaseModel):
     timestamp: str
     severity: str
     trace_id: str
-
-
-class LogsTemplateData(BaseModel):
-    Logs: List[LogData]

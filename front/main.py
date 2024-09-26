@@ -3,32 +3,47 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 
+from front.template_models import CertificateData, LogData
+
 app = FastAPI()
 
-# Mount static files
-app.mount("/static", StaticFiles(directory="front/static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Set up Jinja2 templates
-templates = Jinja2Templates(directory="front/templates")
+templates = Jinja2Templates(directory="templates")
+
 
 @app.get("/", response_class=HTMLResponse)
 async def read_dashboard(request: Request):
-    # Dummy data for certificates
     certificates = [
-        {"id": "1", "name": "Cert 1", "status": "Active", "actions": ["Renew", "Revoke"]},
-        {"id": "2", "name": "Cert 2", "status": "Expired", "actions": ["Renew"]},
+        CertificateData(id="123", name="cert1", status="active", actions=["View", "Renew"]),
+        CertificateData(id="123", name="cert1", status="active", actions=["View", "Renew"]),
+        CertificateData(id="123", name="cert1", status="active", actions=["View", "Renew"]),
     ]
     return templates.TemplateResponse("dashboard.html.j2", {"request": request, "certificates": certificates})
 
+
 @app.get("/logs", response_class=HTMLResponse)
 async def read_logs(request: Request):
-    # Dummy data for logs
     logs = [
-        {"entry_id": "1", "timestamp": "2023-07-01 10:00:00", "severity": "INFO", "trace_id": "abc123", "message": "Certificate generated"},
-        {"entry_id": "2", "timestamp": "2023-07-01 11:00:00", "severity": "WARN", "trace_id": "def456", "message": "Certificate expiring soon"},
+        LogData(
+            entry_id="1ab2",
+            timestamp="05.06.2023 12:00:00",
+            message="Test message",
+            severity="DEBUG",
+            trace_id="222"
+        ),
+        LogData(
+            entry_id="2cc",
+            timestamp="05.01.2022 14:02:00",
+            message="Test message",
+            severity="INFO",
+            trace_id="111"
+        ),
     ]
     return templates.TemplateResponse("logs.html.j2", {"request": request, "logs": logs})
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

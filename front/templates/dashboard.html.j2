@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.html.j2" %}
 
 {% block title %}SSH Certificate Management - Dashboard{% endblock %}
 
@@ -20,7 +20,8 @@
                 <td>{{ cert.status }}</td>
                 <td class="certs-actions-td">
                     {% for action in cert.actions %}
-                        <form method="POST" action="{{ url_for('perform_action') }}" style="display: inline;">
+{#                        <form method="POST" action="{{ url_for('perform_action') }}" style="display: inline;">#}
+                        <form method="POST" action="/hello" style="display: inline;">
                             <input type="hidden" name="cert_id" value="{{ cert.id }}">
                             <input type="hidden" name="action" value="{{ action }}">
                             <button type="submit" class="small-button">{{ action|capitalize }}</button>
@@ -34,9 +35,7 @@
 {% endblock %}
 
 {% block bottom_button %}
-    {% block bottom_button %}
-        <button id="generateCertBtn" class="main-bottom-button">Generate New Certificate</button>
-    {% endblock %}
+    <button id="generateCertBtn" class="main-bottom-button">Generate New Certificate</button>
 {% endblock %}
 
 {% block extra_content %}
@@ -80,5 +79,5 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="script.js"></script>
+    <script src="../static/script.js"></script>
 {% endblock %}

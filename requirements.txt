@@ -1,4 +1,4 @@
-# dev
+# TODO: decompose
 uvicorn~=0.30.6
 fastapi~=0.112.1
 pydantic~=2.8.2
@@ -6,3 +6,4 @@ freezegun~=1.5.1
 psycopg2-binary~=2.9.9
 sqlalchemy~=2.0.35
 httpx~=0.27.2
+jinja2~=3.1.4
