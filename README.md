@@ -69,9 +69,6 @@ All on one page
 Diagram describes general architecture of the application. [Source PUML code](docs/architecture-overview.puml)
 ![architecture overview](https://plantuml.com/plantuml/svg/5Sqx3WCX30RXFgT83W0kaYhLNeKrLa3YWSplvVfXgz5NpJ4H55RBuvKR5ujYMfu96FDBf67vNqQoqwOezmPfyDmhJVGcRdt0wQrRCXm7j-IqJ3LiAyNEau9ooX26gRX-YLvPbX_ty90MT_y0)
 
-### UI Mockup
-See [docs/ui-mockups.md](docs/ui-mockups.md) for ASCII mockups of the UI.
-
 ### Logging
 Convenient logging allows system to be transparent about underlying CLI wrapping. 
 This is important due to unstable nature of CLI tools.
@@ -97,38 +94,38 @@ project_root/
 │
 ├── docker-compose.yml
 ├── README.md
-│
-├── docs/
-│   ├── class-diagram.puml
-│   ├── core-api.yaml
-│   ├── architecture-overview.puml
-│   └── ui-mockups.md
-├── shared/
-│   ├── __init__.py
-│   ├── cli_wrapper.py
-│   ├── logger.py
-│   └── models.py
-│
-├── web_frontend/
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   ├── app.py
-│   ├── api_client.py
-│   ├── ui_components.py
-│   └── templates/
-│       ├── base.html
-│       ├── dashboard.html
-│       ├── logs.html
-│       ├── certificate_management.html
-│       └── modals/
-│           └── generate_cert.html
+├── requirements.txt
 │
 ├── core/
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   ├── main.py
 │   ├── api_server.py
-│   └── certificate_manager.py
+│   ├── certificate_manager.py
+│   ├── Dockerfile
+│   ├── main.py
+│   └── requirements.txt
+│
+├── docs/
+│   ├── architecture-overview.paml
+│   ├── class-diagram.puml
+│   └── core-api.yaml
+│
+├── front/
+│   ├── api_client.py
+│   ├── Dockerfile
+│   ├── main.py
+│   ├── requirements.txt
+│   └── html/
+│       ├── dashboard.html.j2
+│       ├── logs.html.j2
+│       ├── styles.css
+│       └── script.js
+│
+├── shared/
+│   ├── __init__.py
+│   ├── api_models.py
+│   ├── cli_wrapper.py
+│   ├── db_logger.py
+│   ├── logger.py
+│   └── models.py
 │
 ├── auto_setup/
 │   ├── auto_setup.py
