@@ -11,7 +11,7 @@ from core.certificate_manager_interface import (
 from shared.models import KeyType
 
 
-class TestCertificateManager(ICertificateManager):
+class CertificateManagerMock(ICertificateManager):
     SEED = 42  # Constant seed for random generation
 
     def __init__(self):

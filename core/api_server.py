@@ -4,7 +4,7 @@ import uvicorn
 from fastapi import FastAPI, Query, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 
-from core.certificate_manager import CertificateManager
+from core.certificate_manager_interface import ICertificateManager
 from core.trace_id_handler import TraceIdHandler
 from shared.api_models import (
     CertificateDTO,
@@ -32,7 +32,7 @@ _default_response = {
 class APIServer:
     def __init__(
         self,
-        cert_manager: CertificateManager,
+        cert_manager: ICertificateManager,
         logger: Logger,
         version: str,
         port: int,
