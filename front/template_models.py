@@ -1,5 +1,5 @@
-from typing import List
-
+from typing import List, Optional
+from datetime import date
 from pydantic import BaseModel
 
 
@@ -15,3 +15,11 @@ class LogData(BaseModel):
     timestamp: str
     severity: str
     trace_id: str
+
+
+class LogFilterData(BaseModel):
+    commands_only: bool = False
+    date_from: Optional[date] = None
+    date_to: Optional[date] = None
+    keywords: Optional[str] = None
+    severity: List[str] = ["INFO", "WARN", "DEBUG", "ERROR"]

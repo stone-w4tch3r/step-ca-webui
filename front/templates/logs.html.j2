@@ -9,37 +9,27 @@
         <div class="logs-filters-item">
             <label for="commands_only">Commands only:</label>
             <select name="commands_only" id="commands_only">
-                <option value="0">No</option>
-                <option value="1">Yes</option>
+                <option value="0" {% if not filter_data.commands_only %}selected{% endif %}>No</option>
+                <option value="1" {% if filter_data.commands_only %}selected{% endif %}>Yes</option>
             </select>
         </div>
         <div class="logs-filters-item logs-filters-datepicker">
             <label>Date Range:</label>
-            <input type="date" name="date_from" placeholder="From">
-            <input type="date" name="date_to" placeholder="To">
+            <input type="date" name="date_from" placeholder="From" value="{{ filter_data.date_from | default('', true) }}">
+            <input type="date" name="date_to" placeholder="To" value="{{ filter_data.date_to | default('', true) }}">
         </div>
         <div class="logs-filters-item">
             <label for="keywords">Keywords:</label>
-            <input type="text" name="keywords" id="keywords" placeholder="Search...">
+            <input type="text" name="keywords" id="keywords" placeholder="Search..." value="{{ filter_data.keywords | default('', true) }}">
         </div>
         <fieldset class="logs-filters-fieldset">
             <legend class="logs-filters-legend">Severity:</legend>
+            {% for severity in ['INFO', 'WARN', 'DEBUG', 'ERROR'] %}
             <label>
-                <input type="checkbox" name="severity[]" value="INFO" checked>
-                INFO
+                <input type="checkbox" name="severity[]" value="{{ severity }}" {% if severity in filter_data.severity %}checked{% endif %}>
+                {{ severity }}
             </label>
-            <label>
-                <input type="checkbox" name="severity[]" value="WARN" checked>
-                WARN
-            </label>
-            <label>
-                <input type="checkbox" name="severity[]" value="DEBUG" checked>
-                DEBUG
-            </label>
-            <label>
-                <input type="checkbox" name="severity[]" value="ERROR" checked>
-                ERROR
-            </label>
+            {% endfor %}
         </fieldset>
         <button class="small-button" type="submit">Apply</button>
     </form>
