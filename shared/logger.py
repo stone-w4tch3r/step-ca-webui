@@ -35,9 +35,9 @@ class Logger:
     LOGLEVEL = logging.DEBUG
 
     def __init__(
-        self, trace_id_provider: TraceIdProvider, db_handler: IDBLogger
+        self, trace_id_provider: TraceIdProvider, db_logger: IDBLogger
     ) -> None:
-        self.db_logger = db_handler
+        self.db_logger = db_logger
         self.trace_id_provider = trace_id_provider
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(self.LOGLEVEL)

@@ -5,7 +5,7 @@ from shared.db_logger import DBLogger
 from shared.logger import Logger, TraceIdProvider
 
 logger = Logger(
-    TraceIdProvider(lambda: TraceIdHandler.get_current_trace_id()), DBLogger
+    TraceIdProvider(lambda: TraceIdHandler.get_current_trace_id()), DBLogger()
 )
 certificate_manager = CertificateManagerMock()
 api_server = APIServer(certificate_manager, logger, "0.0.1", 5000)

@@ -1,6 +1,7 @@
 import os
 from typing import List, Optional
 
+from pydantic import BaseModel, Field
 from sqlalchemy import (
     create_engine,
     Column,
@@ -32,6 +33,14 @@ class LogEntryModel(_Base):
     command_info = Column(JSON)
 
 
+class DbConnectionModel(BaseModel):
+    DB_HOST: str = Field(..., min_length=1)
+    DB_PORT: int = Field(..., gt=0, lt=65536)
+    DB_NAME: str = Field(..., min_length=1)
+    DB_USER: str = Field(..., min_length=1)
+    DB_PASSWORD: str = Field(..., min_length=1)
+
+
 class DBLogger(IDBLogger):
     """
     DBLogger class for managing database operations related to logging using SQLAlchemy.
@@ -50,10 +59,18 @@ class DBLogger(IDBLogger):
         if is_test:
             return
 
+        connection = DbConnectionModel(
+            DB_HOST=os.getenv("DB_HOST"),
+            DB_PORT=os.getenv("DB_PORT"),
+            DB_NAME=os.getenv("DB_NAME"),
+            DB_USER=os.getenv("DB_USER"),
+            DB_PASSWORD=os.getenv("DB_PASSWORD"),
+        )
+
         url = (
             "postgresql://"
-            + f"{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
-            + f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+            + f"{connection.DB_USER}:{connection.DB_PASSWORD}"
+            + f"@{connection.DB_HOST}:{connection.DB_PORT}/{connection.DB_NAME}"
         )
         self.engine = create_engine(url)
         self.Session = sessionmaker(bind=self.engine)
