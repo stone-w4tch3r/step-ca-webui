@@ -16,7 +16,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
 
-from shared.logger import IDBLogger
+from shared.db_logger_interface import IDBLogger
 from shared.models import LogEntry, LogsFilter, Paging, LogSeverity, CommandInfo
 
 _Base = declarative_base()

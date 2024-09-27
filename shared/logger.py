@@ -2,9 +2,10 @@ import logging
 import sys
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
-from typing import List, Optional, Callable, Protocol
+from typing import List, Optional, Callable
 from uuid import UUID
 
+from shared.db_logger_interface import IDBLogger
 from shared.models import LogEntry, LogSeverity, CommandInfo, LogsFilter, Paging
 
 
@@ -14,16 +15,6 @@ class TraceIdProvider:
 
     def get_current(self) -> UUID | None:
         return self.get_trace_id()
-
-
-class IDBLogger(Protocol):
-    def insert_log(self, log_entry: LogEntry) -> None: ...
-
-    def get_logs(self, filters: LogsFilter, paging: Paging) -> List[LogEntry]: ...
-
-    def get_log_entry(self, log_id: int) -> Optional[LogEntry]: ...
-
-    def get_next_entry_id(self) -> int: ...
 
 
 class Logger:
