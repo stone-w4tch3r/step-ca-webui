@@ -1,37 +1,17 @@
 from datetime import datetime, timedelta
 from typing import List
 
-from pydantic import BaseModel
-
 from shared.cli_wrapper import CLIWrapper
 from shared.logger import Logger, LogSeverity
 from shared.models import CommandInfo, KeyType
+from core.certificate_manager_interface import ICertificateManager, CertificateResult, Certificate
 
 
-class CertificateResult(BaseModel):
-    success: bool
-    message: str
-    log_entry_id: int
-    certificate_id: str
-    certificate_name: str = None
-    expiration_date: datetime = None
-    new_expiration_date: datetime = None
-    revocation_date: datetime = None
-
-
-class Certificate(BaseModel):
-    id: str
-    name: str
-    status: str
-    expiration_date: datetime
-
-
-class CertificateManager:
+class CertificateManager(ICertificateManager):
     def __init__(self, logger: Logger):
         self._logger = logger
         self._cli_wrapper = CLIWrapper()
 
-    # noinspection PyMethodMayBeStatic
     def preview_list_certificates(self) -> str:
         return _Commands.list_certificates()
 
@@ -44,7 +24,6 @@ class CertificateManager:
         # ... (parsing logic here)
         return certificates
 
-    # noinspection PyMethodMayBeStatic
     def preview_generate_certificate(self, key_name: str, key_type: KeyType, duration: int) -> str:
         command = _Commands.generate_certificate(key_name, key_type, duration)
         return command
