@@ -31,7 +31,12 @@ _default_response = {
 # noinspection PyPep8Naming
 class APIServer:
     def __init__(
-        self, cert_manager: CertificateManager, logger: Logger, version: str, port: int, prod_url: str = None,
+        self,
+        cert_manager: CertificateManager,
+        logger: Logger,
+        version: str,
+        port: int,
+        prod_url: str = None,
     ):
         self._cert_manager = cert_manager
         self._logger = logger
@@ -118,7 +123,9 @@ class APIServer:
             responses=_default_response,
         )
         async def renew_certificate(
-            certId: str = Query(...), duration: int = Query(..., description="Duration in seconds"), preview: bool = Query(...),
+            certId: str = Query(...),
+            duration: int = Query(..., description="Duration in seconds"),
+            preview: bool = Query(...),
         ):
             if preview:
                 command = self._cert_manager.preview_renew_certificate(certId, duration)
