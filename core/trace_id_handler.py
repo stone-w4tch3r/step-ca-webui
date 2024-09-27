@@ -17,4 +17,4 @@ class TraceIdHandler:
 
     @staticmethod
     def get_current_trace_id() -> uuid.UUID | None:
-        return getattr(TraceIdHandler._thread_local, 'trace_id', None)
+        return getattr(TraceIdHandler._thread_local, "trace_id", None)

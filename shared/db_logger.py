@@ -1,6 +1,16 @@
 import os
 from typing import List, Optional
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, Enum, JSON, Sequence, select
+
+from sqlalchemy import (
+    create_engine,
+    Column,
+    Integer,
+    String,
+    DateTime,
+    Enum,
+    JSON,
+    Sequence,
+)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
@@ -12,9 +22,9 @@ _Base = declarative_base()
 
 
 class LogEntryModel(_Base):
-    __tablename__ = 'log_entries'
+    __tablename__ = "log_entries"
 
-    id = Column(Integer, Sequence('log_entry_id_seq'), primary_key=True)
+    id = Column(Integer, Sequence("log_entry_id_seq"), primary_key=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
     severity = Column(Enum(LogSeverity))
     message = Column(String)
@@ -40,9 +50,11 @@ class DBLogger(IDBLogger):
         if is_test:
             return
 
-        url = ("postgresql://" +
-               f"{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}" +
-               f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}")
+        url = (
+                "postgresql://"
+                + f"{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
+                + f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+        )
         self.engine = create_engine(url)
         self.Session = sessionmaker(bind=self.engine)
         _Base.metadata.create_all(self.engine)
@@ -54,7 +66,11 @@ class DBLogger(IDBLogger):
                 severity=log_entry.severity,
                 message=log_entry.message,
                 trace_id=str(log_entry.trace_id),
-                command_info=log_entry.command_info.model_dump() if log_entry.command_info else None
+                command_info=(
+                    log_entry.command_info.model_dump()
+                    if log_entry.command_info
+                    else None
+                ),
             )
             session.add(db_log_entry)
             session.commit()
@@ -69,25 +85,38 @@ class DBLogger(IDBLogger):
             if filters.commands_only:
                 query = query.filter(LogEntryModel.command_info.isnot(None))
 
-            query = query.filter(LogEntryModel.severity.in_([s.value for s in filters.severity]))
+            query = query.filter(
+                LogEntryModel.severity.in_([s.value for s in filters.severity])
+            )
 
             query = query.order_by(LogEntryModel.timestamp.desc())
-            query = query.limit(paging.page_size).offset((paging.page - 1) * paging.page_size)
+            query = query.limit(paging.page_size).offset(
+                (paging.page - 1) * paging.page_size
+            )
 
             results = query.all()
 
-            return [LogEntry(
-                entry_id=result.id,
-                timestamp=result.timestamp,
-                severity=result.severity,
-                message=result.message,
-                trace_id=result.trace_id,
-                command_info=CommandInfo.model_validate(result.command_info) if result.command_info else None
-            ) for result in results]
+            return [
+                LogEntry(
+                    entry_id=result.id,
+                    timestamp=result.timestamp,
+                    severity=result.severity,
+                    message=result.message,
+                    trace_id=result.trace_id,
+                    command_info=(
+                        CommandInfo.model_validate(result.command_info)
+                        if result.command_info
+                        else None
+                    ),
+                )
+                for result in results
+            ]
 
     def get_log_entry(self, log_id: int) -> Optional[LogEntry]:
         with self.Session() as session:
-            result = session.query(LogEntryModel).filter(LogEntryModel.id == log_id).first()
+            result = (
+                session.query(LogEntryModel).filter(LogEntryModel.id == log_id).first()
+            )
             if result:
                 return LogEntry(
                     entry_id=result.id,
@@ -95,11 +124,15 @@ class DBLogger(IDBLogger):
                     severity=result.severity,
                     message=result.message,
                     trace_id=result.trace_id,
-                    command_info=CommandInfo.model_validate(result.command_info) if result.command_info else None
+                    command_info=(
+                        CommandInfo.model_validate(result.command_info)
+                        if result.command_info
+                        else None
+                    ),
                 )
             return None
 
     def get_next_entry_id(self) -> int:
         with self.Session() as session:
             # TODO: test in real postgres
-            return session.execute(Sequence('log_entry_id_seq')).scalar()
+            return session.execute(Sequence("log_entry_id_seq")).scalar()

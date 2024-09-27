@@ -1,8 +1,8 @@
 import unittest
-from unittest.mock import Mock, patch
-from uuid import UUID
 from datetime import datetime
 from logging import Logger as PythonLogger
+from unittest.mock import Mock, patch
+from uuid import UUID
 
 from shared.logger import Logger, TraceIdProvider, IDBLogger
 from shared.models import LogEntry, LogSeverity, CommandInfo, LogsFilter, Paging
@@ -15,9 +15,9 @@ class TestLogger(unittest.TestCase):
         # noinspection PyTypeChecker
         self.logger = Logger(self.mock_trace_id_provider, self.mock_db_logger)
 
-    @patch.object(PythonLogger, 'log')
+    @patch.object(PythonLogger, "log")
     def test_log_with_trace_id(self, mock_log):
-        trace_id = UUID('12345678-1234-5678-1234-567812345678')
+        trace_id = UUID("12345678-1234-5678-1234-567812345678")
         self.mock_trace_id_provider.get_current.return_value = trace_id
         self.mock_db_logger.get_next_entry_id.return_value = 1
 
@@ -31,7 +31,7 @@ class TestLogger(unittest.TestCase):
         self.assertEqual(log_entry.message, "Test message")
         self.assertEqual(log_entry.trace_id, trace_id)
 
-    @patch.object(PythonLogger, 'log')
+    @patch.object(PythonLogger, "log")
     def test_log_without_trace_id(self, mock_log):
         self.mock_trace_id_provider.get_current.return_value = None
         self.mock_db_logger.get_next_entry_id.return_value = 1
@@ -46,11 +46,13 @@ class TestLogger(unittest.TestCase):
         self.assertEqual(log_entry.message, "Error message")
         self.assertEqual(log_entry.trace_id, Logger._UNSCOPED_TRACE_ID)
 
-    @patch.object(PythonLogger, 'log')
+    @patch.object(PythonLogger, "log")
     def test_log_with_command_info(self, mock_log):
         self.mock_trace_id_provider.get_current.return_value = None
         self.mock_db_logger.get_next_entry_id.return_value = 1
-        command_info = CommandInfo(command="test_command", output="test_output", exit_code=0, action="TEST")
+        command_info = CommandInfo(
+            command="test_command", output="test_output", exit_code=0, action="TEST"
+        )
 
         log_id = self.logger.log(LogSeverity.DEBUG, "Debug message", command_info)
 
@@ -71,7 +73,7 @@ class TestLogger(unittest.TestCase):
                 timestamp=datetime.now(),
                 severity=LogSeverity.INFO,
                 message="Test",
-                trace_id=UUID('12345678-1234-5678-1234-567812345678')
+                trace_id=UUID("12345678-1234-5678-1234-567812345678"),
             )
         ]
         self.mock_db_logger.get_logs.return_value = expected_logs
@@ -86,8 +88,9 @@ class TestLogger(unittest.TestCase):
         expected_log = LogEntry(
             entry_id=log_id,
             timestamp=datetime.now(),
-            severity=LogSeverity.INFO, message="Test",
-            trace_id=UUID('12345678-1234-5678-1234-567812345678')
+            severity=LogSeverity.INFO,
+            message="Test",
+            trace_id=UUID("12345678-1234-5678-1234-567812345678"),
         )
         self.mock_db_logger.get_log_entry.return_value = expected_log
 
@@ -97,5 +100,5 @@ class TestLogger(unittest.TestCase):
         self.mock_db_logger.get_log_entry.assert_called_once_with(log_id)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

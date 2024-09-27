@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 from typing import List
 
+from core.certificate_manager_interface import ICertificateManager, CertificateResult, Certificate
 from shared.cli_wrapper import CLIWrapper
 from shared.logger import Logger, LogSeverity
 from shared.models import CommandInfo, KeyType
-from core.certificate_manager_interface import ICertificateManager, CertificateResult, Certificate
 
 
 class CertificateManager(ICertificateManager):
@@ -47,7 +47,8 @@ class CertificateManager(ICertificateManager):
             log_entry_id=entry_id,
             certificate_id=key_name,
             certificate_name=key_name,
-            expiration_date=(datetime.now() + timedelta(seconds=duration_in_seconds))  # TODO: parse expiration date from output
+            expiration_date=(datetime.now() + timedelta(seconds=duration_in_seconds))
+            # TODO: parse expiration date from output
         )
 
     def preview_renew_certificate(self, cert_id: str, duration: int) -> str:

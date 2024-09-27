@@ -1,4 +1,5 @@
 # About
+
 The project is a web-based interface for managing a smallstep `step-ca` Certificate Authority.
 In other words, it's shell wrapper for `step-ca` CLI.
 It provides a user-friendly way to handle certificate operations, view logs, and manage server access.
@@ -8,28 +9,34 @@ for audit purposes. Written in python.
 ### Main Functions
 
 #### Certificate Management
+
 All on one page
+
 - List certificates
 - Generate new certificates (with options for key type, duration, etc.)
 - Revoke certificates
 - Renew certificates
 
 #### Logging and Monitoring
+
 - Every action such as certificate generation, revocation etc shows it's related logs immediately to user in the UI
 - Every action shows shell command that it will execute
 - Retrieve logs with filtering
 
 #### Web UI
+
 - Dashboard + Certificate Management Page
 - Logs and Command History Page
 
 #### Auto Setup
+
 1. Install & setup `step-ca` on host
 2. Create initial root certificate
 3. Prepare certificates for mTLS
 4. Run docker-compose.uml
 
 ### Security Features
+
 - Separation of privileged sudo setup process from main application
 - Main application runs in container with limited permissions, only `step-ca` on host is available
 - Web UI is in separate basic docker container
@@ -47,6 +54,7 @@ All on one page
 - Read-only filesystem for containers
 
 ### Tech Stack
+
 - Python
 - Flask
 - Docker
@@ -56,6 +64,7 @@ All on one page
 - step-ca CLI
 
 ### Additional Notes
+
 - Type hints/dataclasses are used throughout for better code clarity and error checking
 - The design allows for easy extension and maintenance
 - The AutoSetup component (for initial installation and setup) is designed to be run separately with elevated privileges
@@ -66,11 +75,13 @@ All on one page
 # Architecture
 
 ### Overview
+
 Diagram describes general architecture of the application. [Source PUML code](docs/architecture-overview.puml)
 ![architecture overview](https://plantuml.com/plantuml/svg/5Sqx3WCX30RXFgT83W0kaYhLNeKrLa3YWSplvVfXgz5NpJ4H55RBuvKR5ujYMfu96FDBf67vNqQoqwOezmPfyDmhJVGcRdt0wQrRCXm7j-IqJ3LiAyNEau9ooX26gRX-YLvPbX_ty90MT_y0)
 
 ### Logging
-Convenient logging allows system to be transparent about underlying CLI wrapping. 
+
+Convenient logging allows system to be transparent about underlying CLI wrapping.
 This is important due to unstable nature of CLI tools.
 
 - Logs are stored in file (in future can be stored in database)
@@ -81,14 +92,18 @@ This is important due to unstable nature of CLI tools.
 - Scoped logging (trace_id) implemented for tracking actions across multiple log entries
 
 ### Core API
+
 See [docs/core-api.yaml](docs/core-api.yaml) for Core component OpenAPI specification.
 
 ### Class Diagram
+
 Describes the class structure of the application's python components. [Source PUML code](docs/class-diagram.puml)
 ![class diagram](https://plantuml.com/plantuml/svg/5Ssz3GCX343XFbCa0t0kaYhLhU8pre441lb7h1zIFNtLEyrHFNfxlAfGYyoXxLdSftq15DTnLoznXR7I46VnWqO7yo6SriUfl7MBPo9CYw-eq75R8Gyoe8PcALUy5Vin_wEJ9U_-0000)
 
 ### File structure
+
 This is final file structure of the project:
+
 ```
 project_root/
 │
@@ -139,5 +154,6 @@ project_root/
 ---
 
 # TODO
+
 - [ ] Adjust class diagram after finalizing the project
 - [ ] Prevent simultaneous actions calls

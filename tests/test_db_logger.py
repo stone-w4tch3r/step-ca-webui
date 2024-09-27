@@ -2,8 +2,10 @@ import unittest
 from datetime import datetime
 from random import random
 from uuid import uuid4
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
 # noinspection PyProtectedMember
 from shared.db_logger import DBLogger, _Base as Base, LogEntryModel
 from shared.models import LogEntry, LogsFilter, Paging, LogSeverity, CommandInfo
@@ -12,7 +14,7 @@ from shared.models import LogEntry, LogsFilter, Paging, LogSeverity, CommandInfo
 class TestDBLogger(unittest.TestCase):
     def setUp(self):
         # Create an in-memory SQLite database for testing
-        self.engine = create_engine('sqlite:///:memory:')
+        self.engine = create_engine("sqlite:///:memory:")
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
 
@@ -24,14 +26,16 @@ class TestDBLogger(unittest.TestCase):
     def test_insert_log(self):
         timestamp = datetime.now()
         trace_id = uuid4()
-        command_info = CommandInfo(command="test_command", output="test output", exit_code=0, action="TEST")
+        command_info = CommandInfo(
+            command="test_command", output="test output", exit_code=0, action="TEST"
+        )
         log_entry = LogEntry(
             entry_id=1,
             timestamp=timestamp,
             severity=LogSeverity.INFO,
             message="Test log message",
             trace_id=trace_id,
-            command_info=command_info
+            command_info=command_info,
         )
 
         self.db_logger.insert_log(log_entry)
@@ -45,7 +49,9 @@ class TestDBLogger(unittest.TestCase):
             self.assertEqual(result.severity, LogSeverity.INFO)
             self.assertEqual(result.message, "Test log message")
             self.assertEqual(result.trace_id, str(trace_id))
-            self.assertEqual(CommandInfo.model_validate(result.command_info), command_info)
+            self.assertEqual(
+                CommandInfo.model_validate(result.command_info), command_info
+            )
 
     def test_get_logs(self):
         # Insert some test logs
@@ -56,7 +62,12 @@ class TestDBLogger(unittest.TestCase):
                 severity=LogSeverity.INFO,
                 message=f"Test log message {i}",
                 trace_id=uuid4(),
-                command_info=CommandInfo(command="test_command", output="test output", exit_code=0, action="TEST")
+                command_info=CommandInfo(
+                    command="test_command",
+                    output="test output",
+                    exit_code=0,
+                    action="TEST",
+                ),
             )
             self.db_logger.insert_log(log_entry)
 
@@ -75,7 +86,7 @@ class TestDBLogger(unittest.TestCase):
             severity=LogSeverity.WARNING,
             message="Test specific log",
             trace_id=uuid4(),
-            command_info=None
+            command_info=None,
         )
         self.db_logger.insert_log(log_entry)
 
@@ -103,12 +114,14 @@ class TestDBLogger(unittest.TestCase):
                 severity=severity,
                 message=f"Test log message with {severity.name} severity",
                 trace_id=uuid4(),
-                command_info=None
+                command_info=None,
             )
             self.db_logger.insert_log(log_entry)
 
         # Test filtering by severity
-        filters = LogsFilter(severity=[LogSeverity.WARNING, LogSeverity.ERROR], commands_only=False)
+        filters = LogsFilter(
+            severity=[LogSeverity.WARNING, LogSeverity.ERROR], commands_only=False
+        )
         paging = Paging(page=1, page_size=10)
         logs = self.db_logger.get_logs(filters, paging)
 
@@ -125,7 +138,7 @@ class TestDBLogger(unittest.TestCase):
                 severity=LogSeverity.INFO,
                 message=f"Test log message {i}",
                 trace_id=uuid4(),
-                command_info=None
+                command_info=None,
             )
             self.db_logger.insert_log(log_entry)
 
@@ -150,5 +163,5 @@ class TestDBLogger(unittest.TestCase):
         self.assertEqual(len(logs), 0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

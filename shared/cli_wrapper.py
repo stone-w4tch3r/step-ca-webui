@@ -11,7 +11,9 @@ class CLIWrapper:
     @staticmethod
     def execute_command(command: str) -> Tuple[str, int]:
         try:
-            result = subprocess.run(command, shell=True, check=True, text=True, capture_output=True)
+            result = subprocess.run(
+                command, shell=True, check=True, text=True, capture_output=True
+            )
             return result.stdout, result.returncode
         except subprocess.CalledProcessError as e:
             return e.stdout, e.returncode

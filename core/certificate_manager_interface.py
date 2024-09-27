@@ -1,7 +1,10 @@
 from datetime import datetime
 from typing import List, Protocol
+
 from pydantic import BaseModel
+
 from shared.models import KeyType
+
 
 class CertificateResult(BaseModel):
     success: bool
@@ -13,11 +16,13 @@ class CertificateResult(BaseModel):
     new_expiration_date: datetime = None
     revocation_date: datetime = None
 
+
 class Certificate(BaseModel):
     id: str
     name: str
     status: str
     expiration_date: datetime
+
 
 class ICertificateManager(Protocol):
     def preview_list_certificates(self) -> str:

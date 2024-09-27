@@ -14,7 +14,8 @@ from shared.api_models import (
     CertificateRevokeResult,
     CommandPreviewDTO,
     LogEntryDTO,
-    LogsRequest, CommandInfoDTO
+    LogsRequest,
+    CommandInfoDTO,
 )
 from shared.logger import Logger, LogsFilter, Paging
 from shared.models import LogSeverity
@@ -22,18 +23,16 @@ from shared.models import LogSeverity
 _default_response = {
     500: {
         "description": "Internal Server Error",
-        "content": {
-            "text/plain": {
-                "example": "An unexpected error occurred"
-            }
-        }
+        "content": {"text/plain": {"example": "An unexpected error occurred"}},
     }
 }
 
 
 # noinspection PyPep8Naming
 class APIServer:
-    def __init__(self, cert_manager: CertificateManager, logger: Logger, version: str, port: int, prod_url: str = None):
+    def __init__(
+        self, cert_manager: CertificateManager, logger: Logger, version: str, port: int, prod_url: str = None,
+    ):
         self._cert_manager = cert_manager
         self._logger = logger
         self._port = port
@@ -44,9 +43,17 @@ class APIServer:
             openapi_url="/openapi.json",
             docs_url="/swagger",
             redoc_url="/redoc",
-            servers=[
-                        {"url": f"http://localhost:{port}", "description": "Local development environment"},
-                    ] + [{"url": prod_url, "description": "Production environment"}] if prod_url else []
+            servers=(
+                [
+                    {
+                        "url": f"http://localhost:{port}",
+                        "description": "Local development environment",
+                    },
+                ]
+                + [{"url": prod_url, "description": "Production environment"}]
+                if prod_url
+                else []
+            ),
         )
 
         self._setup_routes()
@@ -59,9 +66,11 @@ class APIServer:
         @self.App.get(
             "/certificates",
             response_model=Union[List[CertificateDTO], CommandPreviewDTO],
-            responses=_default_response
+            responses=_default_response,
         )
-        async def list_certificates(preview: bool = Query(...)) -> Union[List[CertificateDTO], CommandPreviewDTO]:
+        async def list_certificates(
+            preview: bool = Query(...),
+        ) -> Union[List[CertificateDTO], CommandPreviewDTO]:
             if preview:
                 command = self._cert_manager.preview_list_certificates()
                 return CommandPreviewDTO(command=command)
@@ -72,30 +81,26 @@ class APIServer:
                     id=cert.id,
                     name=cert.name,
                     status=cert.status,
-                    expirationDate=cert.expiration_date
-                ) for cert in certs
+                    expirationDate=cert.expiration_date,
+                )
+                for cert in certs
             ]
 
         @self.App.post(
             "/certificates/generate",
             response_model=Union[CertificateGenerateResult, CommandPreviewDTO],
-            responses=_default_response
+            responses=_default_response,
         )
         async def generate_certificate(
-                cert_request: CertificateGenerateRequest,
-                preview: bool = Query(...)
+            cert_request: CertificateGenerateRequest, preview: bool = Query(...)
         ):
             if preview:
                 command = self._cert_manager.preview_generate_certificate(
-                    cert_request.keyName,
-                    cert_request.keyType,
-                    cert_request.duration
+                    cert_request.keyName, cert_request.keyType, cert_request.duration
                 )
                 return CommandPreviewDTO(command=command)
             cert = self._cert_manager.generate_certificate(
-                cert_request.keyName,
-                cert_request.keyType,
-                cert_request.duration
+                cert_request.keyName, cert_request.keyType, cert_request.duration
             )
 
             return CertificateGenerateResult(
@@ -104,18 +109,16 @@ class APIServer:
                 logEntryId=cert.log_entry_id,
                 certificateId=cert.certificate_id,
                 certificateName=cert.certificate_name,
-                expirationDate=cert.expiration_date
+                expirationDate=cert.expiration_date,
             )
 
         @self.App.post(
             "/certificates/renew",
             response_model=Union[CertificateRenewResult, CommandPreviewDTO],
-            responses=_default_response
+            responses=_default_response,
         )
         async def renew_certificate(
-                certId: str = Query(...),
-                duration: int = Query(..., description="Duration in seconds"),
-                preview: bool = Query(...)
+            certId: str = Query(...), duration: int = Query(..., description="Duration in seconds"), preview: bool = Query(...),
         ):
             if preview:
                 command = self._cert_manager.preview_renew_certificate(certId, duration)
@@ -127,17 +130,16 @@ class APIServer:
                 message=cert.message,
                 logEntryId=cert.log_entry_id,
                 certificateId=cert.certificate_id,
-                newExpirationDate=cert.new_expiration_date
+                newExpirationDate=cert.new_expiration_date,
             )
 
         @self.App.post(
             "/certificates/revoke",
             response_model=Union[CertificateRevokeResult, CommandPreviewDTO],
-            responses=_default_response
+            responses=_default_response,
         )
         async def revoke_certificate(
-                certId: str = Query(...),
-                preview: bool = Query(...)
+            certId: str = Query(...), preview: bool = Query(...)
         ):
             if preview:
                 command = self._cert_manager.preview_revoke_certificate(certId)
@@ -149,10 +151,12 @@ class APIServer:
                 message=cert.message,
                 logEntryId=cert.log_entry_id,
                 certificateId=cert.certificate_id,
-                revocationDate=cert.revocation_date
+                revocationDate=cert.revocation_date,
             )
 
-        @self.App.get("/logs/single", response_model=LogEntryDTO, responses=_default_response)
+        @self.App.get(
+            "/logs/single", response_model=LogEntryDTO, responses=_default_response
+        )
         async def get_log_entry(logId: int = Query(..., gt=0)):
             log_entry = self._logger.get_log_entry(logId)
             if not log_entry:
@@ -164,23 +168,29 @@ class APIServer:
                 severity=log_entry.severity,
                 message=log_entry.message,
                 traceId=log_entry.trace_id,
-                commandInfo=CommandInfoDTO(
-                    command=log_entry.command_info.command,
-                    output=log_entry.command_info.output,
-                    exitCode=log_entry.command_info.exit_code,
-                    action=log_entry.command_info.action
-                ) if log_entry.command_info else None
+                commandInfo=(
+                    CommandInfoDTO(
+                        command=log_entry.command_info.command,
+                        output=log_entry.command_info.output,
+                        exitCode=log_entry.command_info.exit_code,
+                        action=log_entry.command_info.action,
+                    )
+                    if log_entry.command_info
+                    else None
+                ),
             )
 
-        @self.App.post("/logs", response_model=List[LogEntryDTO], responses=_default_response)
+        @self.App.post(
+            "/logs", response_model=List[LogEntryDTO], responses=_default_response
+        )
         async def get_logs(logs_request: LogsRequest) -> List[LogEntryDTO]:
             logs = self._logger.get_logs(
                 LogsFilter(
                     trace_id=logs_request.traceId,
                     commands_only=logs_request.commandsOnly,
-                    severity=logs_request.severity
+                    severity=logs_request.severity,
                 ),
-                Paging(page=logs_request.page, page_size=logs_request.pageSize)
+                Paging(page=logs_request.page, page_size=logs_request.pageSize),
             )
 
             return [
@@ -190,13 +200,18 @@ class APIServer:
                     severity=log.severity,
                     message=log.message,
                     traceId=log.trace_id,
-                    commandInfo=CommandInfoDTO(
-                        command=log.command_info.command,
-                        output=log.command_info.output,
-                        exitCode=log.command_info.exit_code,
-                        action=log.command_info.action
-                    ) if log.command_info else None
-                ) for log in logs
+                    commandInfo=(
+                        CommandInfoDTO(
+                            command=log.command_info.command,
+                            output=log.command_info.output,
+                            exitCode=log.command_info.exit_code,
+                            action=log.command_info.action,
+                        )
+                        if log.command_info
+                        else None
+                    ),
+                )
+                for log in logs
             ]
 
     def _setup_handlers(self):
@@ -206,9 +221,13 @@ class APIServer:
 
         @self.App.exception_handler(Exception)
         async def handle_all_exceptions(request: Request, exc: Exception):
-            trace_id = getattr(request.state, 'trace_id', 'UNKNOWN')
-            self._logger.log(LogSeverity.ERROR, f"Unhandled exception, trace_id [{trace_id}]: {exc}")
-            return PlainTextResponse(f"Internal server error, trace_id [{trace_id}]", status_code=500)
+            trace_id = getattr(request.state, "trace_id", "UNKNOWN")
+            self._logger.log(
+                LogSeverity.ERROR, f"Unhandled exception, trace_id [{trace_id}]: {exc}"
+            )
+            return PlainTextResponse(
+                f"Internal server error, trace_id [{trace_id}]", status_code=500
+            )
 
         @self.App.middleware("http")
         async def setup_logging_scope(request: Request, call_next):

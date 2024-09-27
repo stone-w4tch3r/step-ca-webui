@@ -1,10 +1,10 @@
-from fastapi import FastAPI, Request, Query
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
-from typing import List, Optional, Literal, Union
 from datetime import date
+from typing import List, Optional, Literal, Union
 
+from fastapi import FastAPI, Request, Query
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -53,29 +53,21 @@ async def read_logs(
         date_from: Union[date, Literal[""], None] = Query(None),
         date_to: Union[date, Literal[""], None] = Query(None),
         keywords: Optional[str] = Query(None),
-        severity: List[str] = Query(["INFO", "WARN", "DEBUG", "ERROR"])
+        severity: List[str] = Query(["INFO", "WARN", "DEBUG", "ERROR"]),
 ):
     filter_data = LogFilterData(
         commands_only=commands_only,
         date_from=date_from if date_from != "" else None,
         date_to=date_to if date_to != "" else None,
         keywords=keywords,
-        severity=severity
+        severity=severity,
     )
     logs = [
         LogData(
-            entry_id="1ab2",
-            timestamp="05.06.2023 12:00:00",
-            message="Test message",
-            severity="DEBUG",
-            trace_id="222"
+            entry_id="1ab2", timestamp="05.06.2023 12:00:00", message="Test message", severity="DEBUG", trace_id="222"
         ),
         LogData(
-            entry_id="2cc",
-            timestamp="05.01.2022 14:02:00",
-            message="Test message",
-            severity="INFO",
-            trace_id="111"
+            entry_id="2cc", timestamp="05.01.2022 14:02:00", message="Test message", severity="INFO", trace_id="111"
         ),
     ]
     return templates.TemplateResponse("logs.html.j2", {"request": request, "logs": logs, "filter_data": filter_data})

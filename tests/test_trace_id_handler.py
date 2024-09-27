@@ -1,6 +1,7 @@
 import unittest
 import uuid
 from unittest.mock import patch
+
 from core.trace_id_handler import TraceIdHandler
 
 

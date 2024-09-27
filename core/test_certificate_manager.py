@@ -6,6 +6,7 @@ from uuid import uuid4
 from core.certificate_manager_interface import ICertificateManager, CertificateResult, Certificate
 from shared.models import KeyType
 
+
 class TestCertificateManager(ICertificateManager):
     SEED = 42  # Constant seed for random generation
 
@@ -19,7 +20,7 @@ class TestCertificateManager(ICertificateManager):
                 id=str(uuid4()),
                 name=f"test-cert-{i}",
                 status="active" if self.random.random() > 0.2 else "revoked",
-                expiration_date=datetime.now() + timedelta(days=self.random.randint(1, 365))
+                expiration_date=datetime.now() + timedelta(days=self.random.randint(1, 365)),
             )
             for i in range(10)
         ]
@@ -31,14 +32,15 @@ class TestCertificateManager(ICertificateManager):
         return self.certificates
 
     def preview_generate_certificate(self, key_name: str, key_type: KeyType, duration: int) -> str:
-        return f"step-ca certificate {key_name} {key_name}.crt {key_name}.key --key-type {key_type.value} --not-after {duration}"
+        return (f"step-ca certificate {key_name} {key_name}.crt {key_name}.key " +
+                f"--key-type {key_type.value} --not-after {duration}")
 
     def generate_certificate(self, key_name: str, key_type: KeyType, duration_in_seconds: int) -> CertificateResult:
         new_cert = Certificate(
             id=str(uuid4()),
             name=key_name,
             status="active",
-            expiration_date=datetime.now() + timedelta(seconds=duration_in_seconds)
+            expiration_date=datetime.now() + timedelta(seconds=duration_in_seconds),
         )
         self.certificates.append(new_cert)
         return CertificateResult(
@@ -47,7 +49,7 @@ class TestCertificateManager(ICertificateManager):
             log_entry_id=self.random.randint(1000, 9999),
             certificate_id=new_cert.id,
             certificate_name=new_cert.name,
-            expiration_date=new_cert.expiration_date
+            expiration_date=new_cert.expiration_date,
         )
 
     def preview_renew_certificate(self, cert_id: str, duration: int) -> str:
@@ -63,13 +65,13 @@ class TestCertificateManager(ICertificateManager):
                 message="Certificate renewed successfully",
                 log_entry_id=self.random.randint(1000, 9999),
                 certificate_id=cert_id,
-                new_expiration_date=new_expiration
+                new_expiration_date=new_expiration,
             )
         return CertificateResult(
             success=False,
             message="Certificate not found",
             log_entry_id=self.random.randint(1000, 9999),
-            certificate_id=cert_id
+            certificate_id=cert_id,
         )
 
     def preview_revoke_certificate(self, cert_id: str) -> str:
@@ -84,11 +86,11 @@ class TestCertificateManager(ICertificateManager):
                 message="Certificate revoked successfully",
                 log_entry_id=self.random.randint(1000, 9999),
                 certificate_id=cert_id,
-                revocation_date=datetime.now()
+                revocation_date=datetime.now(),
             )
         return CertificateResult(
             success=False,
             message="Certificate not found",
             log_entry_id=self.random.randint(1000, 9999),
-            certificate_id=cert_id
+            certificate_id=cert_id,
         )

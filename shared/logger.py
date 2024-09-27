@@ -17,17 +17,13 @@ class TraceIdProvider:
 
 
 class IDBLogger(Protocol):
-    def insert_log(self, log_entry: LogEntry) -> None:
-        ...
+    def insert_log(self, log_entry: LogEntry) -> None: ...
 
-    def get_logs(self, filters: LogsFilter, paging: Paging) -> List[LogEntry]:
-        ...
+    def get_logs(self, filters: LogsFilter, paging: Paging) -> List[LogEntry]: ...
 
-    def get_log_entry(self, log_id: int) -> Optional[LogEntry]:
-        ...
+    def get_log_entry(self, log_id: int) -> Optional[LogEntry]: ...
 
-    def get_next_entry_id(self) -> int:
-        ...
+    def get_next_entry_id(self) -> int: ...
 
 
 class Logger:
@@ -38,7 +34,9 @@ class Logger:
     BACKUP_COUNT = 5
     LOGLEVEL = logging.DEBUG
 
-    def __init__(self, trace_id_provider: TraceIdProvider, db_handler: IDBLogger) -> None:
+    def __init__(
+            self, trace_id_provider: TraceIdProvider, db_handler: IDBLogger
+    ) -> None:
         self.db_logger = db_handler
         self.trace_id_provider = trace_id_provider
         self.logger = logging.getLogger(__name__)
@@ -47,18 +45,26 @@ class Logger:
         # Console handler
         console_handler = logging.StreamHandler(sys.stdout)
         console_handler.setLevel(self.LOGLEVEL)
-        console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        console_handler.setFormatter(
+            logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        )
         self.logger.addHandler(console_handler)
 
         # File handler with rotation
-        file_handler = RotatingFileHandler(self.LOG_FILE, maxBytes=self.MAX_FILE_SIZE, backupCount=self.BACKUP_COUNT)
+        file_handler = RotatingFileHandler(
+            self.LOG_FILE, maxBytes=self.MAX_FILE_SIZE, backupCount=self.BACKUP_COUNT
+        )
         file_handler.setLevel(self.LOGLEVEL)
-        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        file_handler.setFormatter(
+            logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        )
         self.logger.addHandler(file_handler)
 
     def log(
-        self, severity: LogSeverity, message: str,
-        command_info: Optional[CommandInfo] = None
+            self,
+            severity: LogSeverity,
+            message: str,
+            command_info: Optional[CommandInfo] = None,
     ) -> int:
         log_entry = LogEntry(
             entry_id=self.db_logger.get_next_entry_id(),
@@ -66,7 +72,7 @@ class Logger:
             severity=severity,
             message=message,
             trace_id=self.trace_id_provider.get_current() or self._UNSCOPED_TRACE_ID,
-            command_info=command_info
+            command_info=command_info,
         )
 
         # Log to console and file
