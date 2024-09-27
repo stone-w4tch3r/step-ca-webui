@@ -1,11 +1,14 @@
 from datetime import date
 from typing import List, Optional, Literal, Union
 
-from fastapi import FastAPI, Request, Query
+from fastapi import FastAPI, Request, Query, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
+
+from api_client import APIClient
+from shared.api_models import CertificateDTO, LogEntryDTO
 
 app = FastAPI()
 
@@ -13,20 +16,14 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
+API_BASE_URL = "http://core-api:8000"  # Adjust this to match your core API's URL
 
-class CertificateData(BaseModel):
-    id: str
-    name: str
-    status: str
-    actions: List[str]
-
-
-class LogData(BaseModel):
-    entry_id: str
-    timestamp: str
-    severity: str
-    trace_id: str
-
+def get_api_client():
+    client = APIClient(API_BASE_URL)
+    try:
+        yield client
+    finally:
+        await client.close()
 
 class LogFilterData(BaseModel):
     commands_only: bool = False
@@ -35,16 +32,10 @@ class LogFilterData(BaseModel):
     keywords: Optional[str] = None
     severity: List[str] = ["INFO", "WARN", "DEBUG", "ERROR"]
 
-
 @app.get("/", response_class=HTMLResponse)
-async def read_dashboard(request: Request):
-    certificates = [
-        CertificateData(id="123", name="cert1", status="active", actions=["View", "Renew"]),
-        CertificateData(id="456", name="cert2", status="expired", actions=["View", "Renew"]),
-        CertificateData(id="789", name="cert3", status="active", actions=["View", "Renew"]),
-    ]
+async def read_dashboard(request: Request, api_client: APIClient = Depends(get_api_client)):
+    certificates = await api_client.list_certificates()
     return templates.TemplateResponse("dashboard.html.j2", {"request": request, "certificates": certificates})
-
 
 @app.get("/logs", response_class=HTMLResponse)
 async def read_logs(
@@ -54,6 +45,7 @@ async def read_logs(
         date_to: Union[date, Literal[""], None] = Query(None),
         keywords: Optional[str] = Query(None),
         severity: List[str] = Query(["INFO", "WARN", "DEBUG", "ERROR"]),
+        api_client: APIClient = Depends(get_api_client)
 ):
     filter_data = LogFilterData(
         commands_only=commands_only,
@@ -62,16 +54,11 @@ async def read_logs(
         keywords=keywords,
         severity=severity,
     )
-    logs = [
-        LogData(
-            entry_id="1ab2", timestamp="05.06.2023 12:00:00", message="Test message", severity="DEBUG", trace_id="222"
-        ),
-        LogData(
-            entry_id="2cc", timestamp="05.01.2022 14:02:00", message="Test message", severity="INFO", trace_id="111"
-        ),
-    ]
+    logs = await api_client.get_logs(
+        commands_only=filter_data.commands_only,
+        severity=filter_data.severity
+    )
     return templates.TemplateResponse("logs.html.j2", {"request": request, "logs": logs, "filter_data": filter_data})
-
 
 if __name__ == "__main__":
     import uvicorn
