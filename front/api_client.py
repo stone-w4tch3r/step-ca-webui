@@ -26,7 +26,11 @@ class APIClient:
         self, request: CertificateGenerateRequest
     ) -> CertificateGenerateResult:
         response = await self.client.post(
-            "/certificates/generate", json=request.dict(), params={"preview": False}
+            "/certificates/generate",
+            json=request.model_dump(),
+            params={
+                "preview": False,
+            },
         )
         response.raise_for_status()
         return CertificateGenerateResult(**response.json())
