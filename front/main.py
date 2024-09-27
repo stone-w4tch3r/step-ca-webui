@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from api_client import APIClient
+from front.api_client import APIClient
 
 API_BASE_URL = "http://localhost:5000"
 app = FastAPI()
