@@ -18,7 +18,7 @@ templates = Jinja2Templates(directory="templates")
 
 API_BASE_URL = "http://core-api:8000"  # Adjust this to match your core API's URL
 
-def get_api_client():
+async def get_api_client():
     client = APIClient(API_BASE_URL)
     try:
         yield client
