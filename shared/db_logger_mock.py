@@ -17,13 +17,19 @@ class DBLoggerMock(IDBLogger):
         filtered_logs = self.logs
 
         if filters.trace_id:
-            filtered_logs = [log for log in filtered_logs if log.trace_id == filters.trace_id]
+            filtered_logs = [
+                log for log in filtered_logs if log.trace_id == filters.trace_id
+            ]
 
         if filters.commands_only:
-            filtered_logs = [log for log in filtered_logs if log.command_info is not None]
+            filtered_logs = [
+                log for log in filtered_logs if log.command_info is not None
+            ]
 
         if filters.severity:
-            filtered_logs = [log for log in filtered_logs if log.severity in filters.severity]
+            filtered_logs = [
+                log for log in filtered_logs if log.severity in filters.severity
+            ]
 
         start = (paging.page - 1) * paging.page_size
         end = start + paging.page_size
