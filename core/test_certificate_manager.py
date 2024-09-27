@@ -3,7 +3,11 @@ from datetime import datetime, timedelta
 from typing import List
 from uuid import uuid4
 
-from core.certificate_manager_interface import ICertificateManager, CertificateResult, Certificate
+from core.certificate_manager_interface import (
+    ICertificateManager,
+    CertificateResult,
+    Certificate,
+)
 from shared.models import KeyType
 
 
@@ -20,7 +24,8 @@ class TestCertificateManager(ICertificateManager):
                 id=str(uuid4()),
                 name=f"test-cert-{i}",
                 status="active" if self.random.random() > 0.2 else "revoked",
-                expiration_date=datetime.now() + timedelta(days=self.random.randint(1, 365)),
+                expiration_date=datetime.now()
+                + timedelta(days=self.random.randint(1, 365)),
             )
             for i in range(10)
         ]
@@ -31,11 +36,17 @@ class TestCertificateManager(ICertificateManager):
     def list_certificates(self) -> List[Certificate]:
         return self.certificates
 
-    def preview_generate_certificate(self, key_name: str, key_type: KeyType, duration: int) -> str:
-        return (f"step-ca certificate {key_name} {key_name}.crt {key_name}.key " +
-                f"--key-type {key_type.value} --not-after {duration}")
+    def preview_generate_certificate(
+        self, key_name: str, key_type: KeyType, duration: int
+    ) -> str:
+        return (
+            f"step-ca certificate {key_name} {key_name}.crt {key_name}.key "
+            + f"--key-type {key_type.value} --not-after {duration}"
+        )
 
-    def generate_certificate(self, key_name: str, key_type: KeyType, duration_in_seconds: int) -> CertificateResult:
+    def generate_certificate(
+        self, key_name: str, key_type: KeyType, duration_in_seconds: int
+    ) -> CertificateResult:
         new_cert = Certificate(
             id=str(uuid4()),
             name=key_name,
