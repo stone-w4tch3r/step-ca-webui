@@ -1,490 +1,490 @@
 openapi: 3.1.0
 info:
-  title: Step-CA Management API
-  description: API for managing step-ca Certificate Authority
-  version: 0.0.1
+    title: Step-CA Management API
+    description: API for managing step-ca Certificate Authority
+    version: 0.0.1
 paths:
-  /certificates:
-    get:
-      summary: List Certificates
-      operationId: list_certificates_certificates_get
-      parameters:
-        - name: preview
-          in: query
-          required: true
-          schema:
-            type: boolean
-            title: Preview
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                anyOf:
-                  - type: array
-                    items:
-                      $ref: '#/components/schemas/CertificateDTO'
-                  - $ref: '#/components/schemas/CommandPreviewDTO'
-                title: Response List Certificates Certificates Get
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-        '500':
-          description: Internal Server Error
-          content:
-            text/plain:
-              example: An unexpected error occurred
-  /certificates/generate:
-    post:
-      summary: Generate Certificate
-      operationId: generate_certificate_certificates_generate_post
-      parameters:
-        - name: preview
-          in: query
-          required: true
-          schema:
-            type: boolean
-            title: Preview
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CertificateGenerateRequest'
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                anyOf:
-                  - $ref: '#/components/schemas/CertificateGenerateResult'
-                  - $ref: '#/components/schemas/CommandPreviewDTO'
-                title: Response Generate Certificate Certificates Generate Post
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-        '500':
-          description: Internal Server Error
-          content:
-            text/plain:
-              example: An unexpected error occurred
-  /certificates/renew:
-    post:
-      summary: Renew Certificate
-      operationId: renew_certificate_certificates_renew_post
-      parameters:
-        - name: certId
-          in: query
-          required: true
-          schema:
-            type: string
-            title: Certid
-        - name: duration
-          in: query
-          required: true
-          schema:
-            type: integer
-            description: Duration in seconds
-            title: Duration
-          description: Duration in seconds
-        - name: preview
-          in: query
-          required: true
-          schema:
-            type: boolean
-            title: Preview
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                anyOf:
-                  - $ref: '#/components/schemas/CertificateRenewResult'
-                  - $ref: '#/components/schemas/CommandPreviewDTO'
-                title: Response Renew Certificate Certificates Renew Post
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-        '500':
-          description: Internal Server Error
-          content:
-            text/plain:
-              example: An unexpected error occurred
-  /certificates/revoke:
-    post:
-      summary: Revoke Certificate
-      operationId: revoke_certificate_certificates_revoke_post
-      parameters:
-        - name: certId
-          in: query
-          required: true
-          schema:
-            type: string
-            title: Certid
-        - name: preview
-          in: query
-          required: true
-          schema:
-            type: boolean
-            title: Preview
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                anyOf:
-                  - $ref: '#/components/schemas/CertificateRevokeResult'
-                  - $ref: '#/components/schemas/CommandPreviewDTO'
-                title: Response Revoke Certificate Certificates Revoke Post
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-        '500':
-          description: Internal Server Error
-          content:
-            text/plain:
-              example: An unexpected error occurred
-  /logs/single:
-    get:
-      summary: Get Log Entry
-      operationId: get_log_entry_logs_single_get
-      parameters:
-        - name: logId
-          in: query
-          required: true
-          schema:
-            type: integer
-            exclusiveMinimum: 0
-            title: Logid
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LogEntryDTO'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-        '500':
-          description: Internal Server Error
-          content:
-            text/plain:
-              example: An unexpected error occurred
-  /logs:
-    post:
-      summary: Get Logs
-      operationId: get_logs_logs_post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LogsRequest'
-        required: true
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/LogEntryDTO'
-                type: array
-                title: Response Get Logs Logs Post
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-        '500':
-          description: Internal Server Error
-          content:
-            text/plain:
-              example: An unexpected error occurred
+    /certificates:
+        get:
+            summary: List Certificates
+            operationId: list_certificates_certificates_get
+            parameters:
+                -   name: preview
+                    in: query
+                    required: true
+                    schema:
+                        type: boolean
+                        title: Preview
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                anyOf:
+                                    -   type: array
+                                        items:
+                                            $ref: '#/components/schemas/CertificateDTO'
+                                    -   $ref: '#/components/schemas/CommandPreviewDTO'
+                                title: Response List Certificates Certificates Get
+                '422':
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HTTPValidationError'
+                '500':
+                    description: Internal Server Error
+                    content:
+                        text/plain:
+                            example: An unexpected error occurred
+    /certificates/generate:
+        post:
+            summary: Generate Certificate
+            operationId: generate_certificate_certificates_generate_post
+            parameters:
+                -   name: preview
+                    in: query
+                    required: true
+                    schema:
+                        type: boolean
+                        title: Preview
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CertificateGenerateRequest'
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                anyOf:
+                                    -   $ref: '#/components/schemas/CertificateGenerateResult'
+                                    -   $ref: '#/components/schemas/CommandPreviewDTO'
+                                title: Response Generate Certificate Certificates Generate Post
+                '422':
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HTTPValidationError'
+                '500':
+                    description: Internal Server Error
+                    content:
+                        text/plain:
+                            example: An unexpected error occurred
+    /certificates/renew:
+        post:
+            summary: Renew Certificate
+            operationId: renew_certificate_certificates_renew_post
+            parameters:
+                -   name: certId
+                    in: query
+                    required: true
+                    schema:
+                        type: string
+                        title: Certid
+                -   name: duration
+                    in: query
+                    required: true
+                    schema:
+                        type: integer
+                        description: Duration in seconds
+                        title: Duration
+                    description: Duration in seconds
+                -   name: preview
+                    in: query
+                    required: true
+                    schema:
+                        type: boolean
+                        title: Preview
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                anyOf:
+                                    -   $ref: '#/components/schemas/CertificateRenewResult'
+                                    -   $ref: '#/components/schemas/CommandPreviewDTO'
+                                title: Response Renew Certificate Certificates Renew Post
+                '422':
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HTTPValidationError'
+                '500':
+                    description: Internal Server Error
+                    content:
+                        text/plain:
+                            example: An unexpected error occurred
+    /certificates/revoke:
+        post:
+            summary: Revoke Certificate
+            operationId: revoke_certificate_certificates_revoke_post
+            parameters:
+                -   name: certId
+                    in: query
+                    required: true
+                    schema:
+                        type: string
+                        title: Certid
+                -   name: preview
+                    in: query
+                    required: true
+                    schema:
+                        type: boolean
+                        title: Preview
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                anyOf:
+                                    -   $ref: '#/components/schemas/CertificateRevokeResult'
+                                    -   $ref: '#/components/schemas/CommandPreviewDTO'
+                                title: Response Revoke Certificate Certificates Revoke Post
+                '422':
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HTTPValidationError'
+                '500':
+                    description: Internal Server Error
+                    content:
+                        text/plain:
+                            example: An unexpected error occurred
+    /logs/single:
+        get:
+            summary: Get Log Entry
+            operationId: get_log_entry_logs_single_get
+            parameters:
+                -   name: logId
+                    in: query
+                    required: true
+                    schema:
+                        type: integer
+                        exclusiveMinimum: 0
+                        title: Logid
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/LogEntryDTO'
+                '422':
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HTTPValidationError'
+                '500':
+                    description: Internal Server Error
+                    content:
+                        text/plain:
+                            example: An unexpected error occurred
+    /logs:
+        post:
+            summary: Get Logs
+            operationId: get_logs_logs_post
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/LogsRequest'
+                required: true
+            responses:
+                '200':
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/LogEntryDTO'
+                                type: array
+                                title: Response Get Logs Logs Post
+                '422':
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/HTTPValidationError'
+                '500':
+                    description: Internal Server Error
+                    content:
+                        text/plain:
+                            example: An unexpected error occurred
 components:
-  schemas:
-    CertificateDTO:
-      properties:
-        id:
-          type: string
-          title: Id
-        name:
-          type: string
-          title: Name
-        status:
-          type: string
-          title: Status
-        expirationDate:
-          type: string
-          format: date-time
-          title: Expirationdate
-      type: object
-      required:
-        - id
-        - name
-        - status
-        - expirationDate
-      title: CertificateDTO
-    CertificateGenerateRequest:
-      properties:
-        keyName:
-          type: string
-          pattern: ^[a-zA-Z0-9_-]+$
-          title: Keyname
-          description: Alphanumeric characters, dashes, and underscores only
-        keyType:
-          $ref: '#/components/schemas/KeyType'
-        duration:
-          type: integer
-          exclusiveMinimum: 0
-          title: Duration
-          description: Duration in seconds
-      type: object
-      required:
-        - keyName
-        - keyType
-        - duration
-      title: CertificateGenerateRequest
-    CertificateGenerateResult:
-      properties:
-        success:
-          type: boolean
-          title: Success
-        message:
-          type: string
-          title: Message
-        logEntryId:
-          type: integer
-          exclusiveMinimum: 0
-          title: Logentryid
-        certificateId:
-          type: string
-          title: Certificateid
-        certificateName:
-          type: string
-          title: Certificatename
-        expirationDate:
-          type: string
-          format: date-time
-          title: Expirationdate
-      type: object
-      required:
-        - success
-        - message
-        - logEntryId
-        - certificateId
-        - certificateName
-        - expirationDate
-      title: CertificateGenerateResult
-    CertificateRenewResult:
-      properties:
-        success:
-          type: boolean
-          title: Success
-        message:
-          type: string
-          title: Message
-        logEntryId:
-          type: integer
-          exclusiveMinimum: 0
-          title: Logentryid
-        certificateId:
-          type: string
-          title: Certificateid
-        newExpirationDate:
-          type: string
-          format: date-time
-          title: Newexpirationdate
-      type: object
-      required:
-        - success
-        - message
-        - logEntryId
-        - certificateId
-        - newExpirationDate
-      title: CertificateRenewResult
-    CertificateRevokeResult:
-      properties:
-        success:
-          type: boolean
-          title: Success
-        message:
-          type: string
-          title: Message
-        logEntryId:
-          type: integer
-          exclusiveMinimum: 0
-          title: Logentryid
-        certificateId:
-          type: string
-          title: Certificateid
-        revocationDate:
-          type: string
-          format: date-time
-          title: Revocationdate
-      type: object
-      required:
-        - success
-        - message
-        - logEntryId
-        - certificateId
-        - revocationDate
-      title: CertificateRevokeResult
-    CommandInfoDTO:
-      properties:
-        command:
-          type: string
-          title: Command
-        output:
-          type: string
-          title: Output
-        exitCode:
-          type: integer
-          title: Exitcode
-        action:
-          type: string
-          title: Action
-      type: object
-      required:
-        - command
-        - output
-        - exitCode
-        - action
-      title: CommandInfoDTO
-    CommandPreviewDTO:
-      properties:
-        command:
-          type: string
-          title: Command
-      type: object
-      required:
-        - command
-      title: CommandPreviewDTO
-    HTTPValidationError:
-      properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-    KeyType:
-      type: string
-      enum:
-        - RSA
-        - ECDSA
-      title: KeyType
-    LogEntryDTO:
-      properties:
-        entryId:
-          type: integer
-          exclusiveMinimum: 0
-          title: Entryid
-        timestamp:
-          type: string
-          format: date-time
-          title: Timestamp
-        severity:
-          $ref: '#/components/schemas/LogSeverity'
-        message:
-          type: string
-          title: Message
-        traceId:
-          type: string
-          format: uuid
-          title: Traceid
-        commandInfo:
-          anyOf:
-            - $ref: '#/components/schemas/CommandInfoDTO'
-            - type: 'null'
-      type: object
-      required:
-        - entryId
-        - timestamp
-        - severity
-        - message
-        - traceId
-        - commandInfo
-      title: LogEntryDTO
-    LogSeverity:
-      type: string
-      enum:
-        - DEBUG
-        - INFO
-        - WARN
-        - ERROR
-      title: LogSeverity
-    LogsRequest:
-      properties:
-        traceId:
-          anyOf:
-            - type: string
-              format: uuid
-            - type: 'null'
-          title: Traceid
-        commandsOnly:
-          type: boolean
-          title: Commandsonly
-        severity:
-          items:
-            $ref: '#/components/schemas/LogSeverity'
-          type: array
-          title: Severity
-        page:
-          type: integer
-          exclusiveMinimum: 0
-          title: Page
-        pageSize:
-          type: integer
-          exclusiveMinimum: 0
-          title: Pagesize
-      type: object
-      required:
-        - traceId
-        - commandsOnly
-        - severity
-        - page
-        - pageSize
-      title: LogsRequest
-    ValidationError:
-      properties:
-        loc:
-          items:
-            anyOf:
-              - type: string
-              - type: integer
-          type: array
-          title: Location
-        msg:
-          type: string
-          title: Message
-        type:
-          type: string
-          title: Error Type
-      type: object
-      required:
-        - loc
-        - msg
-        - type
-      title: ValidationError
+    schemas:
+        CertificateDTO:
+            properties:
+                id:
+                    type: string
+                    title: Id
+                name:
+                    type: string
+                    title: Name
+                status:
+                    type: string
+                    title: Status
+                expirationDate:
+                    type: string
+                    format: date-time
+                    title: Expirationdate
+            type: object
+            required:
+                - id
+                - name
+                - status
+                - expirationDate
+            title: CertificateDTO
+        CertificateGenerateRequest:
+            properties:
+                keyName:
+                    type: string
+                    pattern: ^[a-zA-Z0-9_-]+$
+                    title: Keyname
+                    description: Alphanumeric characters, dashes, and underscores only
+                keyType:
+                    $ref: '#/components/schemas/KeyType'
+                duration:
+                    type: integer
+                    exclusiveMinimum: 0
+                    title: Duration
+                    description: Duration in seconds
+            type: object
+            required:
+                - keyName
+                - keyType
+                - duration
+            title: CertificateGenerateRequest
+        CertificateGenerateResult:
+            properties:
+                success:
+                    type: boolean
+                    title: Success
+                message:
+                    type: string
+                    title: Message
+                logEntryId:
+                    type: integer
+                    exclusiveMinimum: 0
+                    title: Logentryid
+                certificateId:
+                    type: string
+                    title: Certificateid
+                certificateName:
+                    type: string
+                    title: Certificatename
+                expirationDate:
+                    type: string
+                    format: date-time
+                    title: Expirationdate
+            type: object
+            required:
+                - success
+                - message
+                - logEntryId
+                - certificateId
+                - certificateName
+                - expirationDate
+            title: CertificateGenerateResult
+        CertificateRenewResult:
+            properties:
+                success:
+                    type: boolean
+                    title: Success
+                message:
+                    type: string
+                    title: Message
+                logEntryId:
+                    type: integer
+                    exclusiveMinimum: 0
+                    title: Logentryid
+                certificateId:
+                    type: string
+                    title: Certificateid
+                newExpirationDate:
+                    type: string
+                    format: date-time
+                    title: Newexpirationdate
+            type: object
+            required:
+                - success
+                - message
+                - logEntryId
+                - certificateId
+                - newExpirationDate
+            title: CertificateRenewResult
+        CertificateRevokeResult:
+            properties:
+                success:
+                    type: boolean
+                    title: Success
+                message:
+                    type: string
+                    title: Message
+                logEntryId:
+                    type: integer
+                    exclusiveMinimum: 0
+                    title: Logentryid
+                certificateId:
+                    type: string
+                    title: Certificateid
+                revocationDate:
+                    type: string
+                    format: date-time
+                    title: Revocationdate
+            type: object
+            required:
+                - success
+                - message
+                - logEntryId
+                - certificateId
+                - revocationDate
+            title: CertificateRevokeResult
+        CommandInfoDTO:
+            properties:
+                command:
+                    type: string
+                    title: Command
+                output:
+                    type: string
+                    title: Output
+                exitCode:
+                    type: integer
+                    title: Exitcode
+                action:
+                    type: string
+                    title: Action
+            type: object
+            required:
+                - command
+                - output
+                - exitCode
+                - action
+            title: CommandInfoDTO
+        CommandPreviewDTO:
+            properties:
+                command:
+                    type: string
+                    title: Command
+            type: object
+            required:
+                - command
+            title: CommandPreviewDTO
+        HTTPValidationError:
+            properties:
+                detail:
+                    items:
+                        $ref: '#/components/schemas/ValidationError'
+                    type: array
+                    title: Detail
+            type: object
+            title: HTTPValidationError
+        KeyType:
+            type: string
+            enum:
+                - RSA
+                - ECDSA
+            title: KeyType
+        LogEntryDTO:
+            properties:
+                entryId:
+                    type: integer
+                    exclusiveMinimum: 0
+                    title: Entryid
+                timestamp:
+                    type: string
+                    format: date-time
+                    title: Timestamp
+                severity:
+                    $ref: '#/components/schemas/LogSeverity'
+                message:
+                    type: string
+                    title: Message
+                traceId:
+                    type: string
+                    format: uuid
+                    title: Traceid
+                commandInfo:
+                    anyOf:
+                        -   $ref: '#/components/schemas/CommandInfoDTO'
+                        -   type: 'null'
+            type: object
+            required:
+                - entryId
+                - timestamp
+                - severity
+                - message
+                - traceId
+                - commandInfo
+            title: LogEntryDTO
+        LogSeverity:
+            type: string
+            enum:
+                - DEBUG
+                - INFO
+                - WARN
+                - ERROR
+            title: LogSeverity
+        LogsRequest:
+            properties:
+                traceId:
+                    anyOf:
+                        -   type: string
+                            format: uuid
+                        -   type: 'null'
+                    title: Traceid
+                commandsOnly:
+                    type: boolean
+                    title: Commandsonly
+                severity:
+                    items:
+                        $ref: '#/components/schemas/LogSeverity'
+                    type: array
+                    title: Severity
+                page:
+                    type: integer
+                    exclusiveMinimum: 0
+                    title: Page
+                pageSize:
+                    type: integer
+                    exclusiveMinimum: 0
+                    title: Pagesize
+            type: object
+            required:
+                - traceId
+                - commandsOnly
+                - severity
+                - page
+                - pageSize
+            title: LogsRequest
+        ValidationError:
+            properties:
+                loc:
+                    items:
+                        anyOf:
+                            -   type: string
+                            -   type: integer
+                    type: array
+                    title: Location
+                msg:
+                    type: string
+                    title: Message
+                type:
+                    type: string
+                    title: Error Type
+            type: object
+            required:
+                - loc
+                - msg
+                - type
+            title: ValidationError

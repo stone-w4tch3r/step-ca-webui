@@ -35,7 +35,7 @@ class Logger:
     LOGLEVEL = logging.DEBUG
 
     def __init__(
-            self, trace_id_provider: TraceIdProvider, db_handler: IDBLogger
+        self, trace_id_provider: TraceIdProvider, db_handler: IDBLogger
     ) -> None:
         self.db_logger = db_handler
         self.trace_id_provider = trace_id_provider
@@ -61,10 +61,10 @@ class Logger:
         self.logger.addHandler(file_handler)
 
     def log(
-            self,
-            severity: LogSeverity,
-            message: str,
-            command_info: Optional[CommandInfo] = None,
+        self,
+        severity: LogSeverity,
+        message: str,
+        command_info: Optional[CommandInfo] = None,
     ) -> int:
         log_entry = LogEntry(
             entry_id=self.db_logger.get_next_entry_id(),
