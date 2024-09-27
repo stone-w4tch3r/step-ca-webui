@@ -2,16 +2,38 @@ from fastapi import FastAPI, Request, Query
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
-from typing import List, Optional
+from typing import List, Optional, Literal, Union
 from datetime import date
 
-from front.template_models import CertificateData, LogData, LogFilterData
+from pydantic import BaseModel
 
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
+
+
+class CertificateData(BaseModel):
+    id: str
+    name: str
+    status: str
+    actions: List[str]
+
+
+class LogData(BaseModel):
+    entry_id: str
+    timestamp: str
+    severity: str
+    trace_id: str
+
+
+class LogFilterData(BaseModel):
+    commands_only: bool = False
+    date_from: Optional[date] = None
+    date_to: Optional[date] = None
+    keywords: Optional[str] = None
+    severity: List[str] = ["INFO", "WARN", "DEBUG", "ERROR"]
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -26,23 +48,20 @@ async def read_dashboard(request: Request):
 
 @app.get("/logs", response_class=HTMLResponse)
 async def read_logs(
-    request: Request,
-    commands_only: bool = Query(False),
-    date_from: Optional[date] = Query(None),
-    date_to: Optional[date] = Query(None),
-    keywords: Optional[str] = Query(None),
-    severity: List[str] = Query(["INFO", "WARN", "DEBUG", "ERROR"])
+        request: Request,
+        commands_only: bool = Query(False),
+        date_from: Union[date, Literal[""], None] = Query(None),
+        date_to: Union[date, Literal[""], None] = Query(None),
+        keywords: Optional[str] = Query(None),
+        severity: List[str] = Query(["INFO", "WARN", "DEBUG", "ERROR"])
 ):
     filter_data = LogFilterData(
         commands_only=commands_only,
-        date_from=date_from,
-        date_to=date_to,
+        date_from=date_from if date_from != "" else None,
+        date_to=date_to if date_to != "" else None,
         keywords=keywords,
         severity=severity
     )
-    
-    # Here you would typically use the filter_data to query your logs
-    # For now, we'll just use the sample logs
     logs = [
         LogData(
             entry_id="1ab2",
