@@ -1,5 +1,6 @@
 # About
 
+
 The project is a web-based interface for managing a smallstep `step-ca` Certificate Authority.
 In other words, it's shell wrapper for `step-ca` CLI.
 It provides a user-friendly way to handle certificate operations, view logs, and manage server access.
